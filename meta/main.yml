@@ -1,0 +1,47 @@
+---
+galaxy_info:
+  author: Orcun Atakan
+  description: Ansible galaxy role for building a Windows template on any cloud platform(ovirt/rhev, VMware, EC2, Azure etc.)
+  company: Red Hat
+
+  license: MIT
+
+  min_ansible_version: 2.5
+
+  platforms:
+    - name: Windows
+      versions:
+        - all
+
+  categories:
+    - all
+
+  cloud_platforms:
+    - amazon
+    - google
+    - microsoft
+    - azure
+    - vmware
+    - ovirt
+    - rhev
+    - rhv
+
+  galaxy_tags:
+    - windows
+    - ec2
+    - vmware
+    - azure
+    - microsoft
+    - rhev
+    - rhv
+    - ovirt
+    - aws
+    - cloud
+    - multicloud
+    - template
+
+dependencies:
+  - oatakan.windows-ec2-ena-support
+  - oatakan.windows-ovirt-guest-agent
+  - oatakan.windows-virtio
+  - oatakan.windows-vmware-tools

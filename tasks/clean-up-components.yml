@@ -1,0 +1,5 @@
+---
+
+- name: clean up components and update files
+  win_shell: Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase
+  ignore_errors: yes

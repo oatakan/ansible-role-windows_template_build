@@ -1,0 +1,4 @@
+---
+
+- name: install windows update using powershell script
+  script: win-updates.ps1

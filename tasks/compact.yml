@@ -1,0 +1,91 @@
+---
+
+- name: create temp directory
+  win_file:
+    path: '{{ temp_directory }}\win_build'
+    state: directory
+
+- name: download sdelete
+  win_get_url:
+    url: '{{ sdelete_download_url }}'
+    dest: '{{ temp_directory }}\win_build\SDelete.zip'
+  register: download_sdelete
+  until: download_sdelete is success
+  delay: 3
+  retries: 5
+  when: sdelete_download_url is defined
+
+- name: copy sdelete
+  win_copy:
+    src: SDelete.zip
+    dest: '{{ temp_directory }}\win_build\SDelete.zip'
+  when: sdelete_download_url is undefined
+
+- name: unzip sdelete
+  win_unzip:
+    src: '{{ temp_directory }}\win_build\SDelete.zip'
+    dest: '{{ temp_directory }}\win_build'
+
+- name: download ultradefrag
+  win_get_url:
+    url: '{{ ultradefrag_download_url }}'
+    dest: '{{ temp_directory }}\win_build\ultradefrag.zip'
+  register: download_ultradefrag
+  until: download_ultradefrag is success
+  delay: 3
+  retries: 5
+
+- name: unzip ultradefrag
+  win_unzip:
+    src: '{{ temp_directory }}\win_build\ultradefrag.zip'
+    dest: '{{ temp_directory }}\win_build'
+
+- name: stop windows update service
+  win_service:
+    name: wuauserv
+    state: stopped
+  ignore_errors: yes
+
+- name: delete update directory
+  win_file:
+    path: C:\Windows\SoftwareDistribution\Download
+    state: absent
+  ignore_errors: yes
+
+- name: start windows update service
+  win_service:
+    name: wuauserv
+    state: started
+  ignore_errors: yes
+
+- name: create update directory
+  win_file:
+    path: C:\Windows\SoftwareDistribution\Download
+    state: directory
+  ignore_errors: yes
+
+- name: set udefrag extract directory
+  set_fact:
+    udefrag_dir: '{{ temp_directory }}\win_build\ultradefrag-portable-6.1.0.amd64'
+
+- name: defrag with ultradefrag
+  win_shell: '{{ udefrag_dir }}\udefrag.exe --optimize --repeat C:'
+  args:
+    executable: cmd
+
+- name: accept sdelete eula
+  win_regedit:
+    path: HKCU:\Software\Sysinternals\SDelete
+    name: EulaAccepted
+    data: 1
+    type: dword
+
+- name: compact with sdelete
+  win_shell: '{{ temp_directory }}\win_build\sdelete.exe -q -z C:'
+  args:
+    executable: cmd
+
+- name: remove temp files
+  win_file:
+    path: '{{ temp_directory }}\win_build'
+    state: absent

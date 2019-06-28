@@ -1,0 +1,15 @@
+---
+
+# do not enable this by default
+- name: allow unauthenticated guest access
+  win_regedit:
+    path: HKLM:\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters
+    name: AllowInsecureGuestAuth
+    data: 1
+    type: dword
+  when: policy.allow_unauthenticated_guest_access|bool
+
+- name: set connection profile to private
+  win_shell: Set-NetConnectionProfile -NetworkCategory Private
+  when:
+    - "'Windows 10' in ansible_distribution"

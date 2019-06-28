@@ -1,0 +1,39 @@
+---
+
+install_updates: yes
+remove_apps: no
+clean_up_components: yes
+temp_directory: "{{ ansible_env.TEMP }}"
+
+#sdelete_download_url: http://web.archive.org/web/20140902022253/http://download.sysinternals.com/files/SDelete.zip
+sdelete_download_url: https://download.sysinternals.com/files/SDelete.zip
+ultradefrag_download_url: http://downloads.sourceforge.net/project/ultradefrag/stable-release/6.1.0/ultradefrag-portable-6.1.0.bin.amd64.zip
+
+enable_auto_logon: no
+
+target_ovirt: no
+target_ec2: no
+
+policy:
+  allow_unauthenticated_guest_access: no
+
+unattend:
+  administrator_password: Chang3MyP@ssw0rd21
+  local_accounts:
+    - name: ansible
+      display_name: ansible
+      description: ansible user
+      group: Administrators
+      password: Chang3MyP@ssw0rd21
+  settings:
+    computer_name: wintemp
+    time_zone: Central Standard Time
+    skip_auto_activation: true
+
+autologin_registry:
+  - name: AutoAdminLogon
+    data: 1
+  - name: DefaultUserName
+    data: "{{ unattend.local_accounts[0].name }}"
+  - name: DefaultPassword
+    data: "{{ unattend.local_accounts[0].password }}"

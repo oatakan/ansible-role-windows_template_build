@@ -1,0 +1,63 @@
+---
+
+- name: recompile .NET assemblies
+  win_dotnet_ngen:
+
+#- name: enable custom answer file
+#  win_regedit:
+#    path: HKLM:\System\Setup
+#    name: UnattendFile
+#    data: C:\Windows\system32\sysprep\unattend.xml
+#    type: string
+
+- name: copy unattend.xml
+  win_template:
+    src: unattend.xml.j2
+    dest: C:\Windows\system32\sysprep\unattend.xml
+  when:
+    - "'VMware' not in ansible_product_name"
+    - not target_ovirt | bool
+
+#- name: run sysprep
+#  win_shell: C:\Windows\system32\sysprep\sysprep.exe /generalize /shutdown /oobe /quiet
+#  args:
+#    executable: cmd
+#  async: 1200
+#  poll: 0
+
+- name: create scheduled task to delete WinRM listeners and shutdown
+  win_scheduled_task:
+    name: sysprep-shutdown
+    username: SYSTEM
+    disallow_start_if_on_batteries: no
+    stop_if_going_on_batteries: no
+    actions:
+    - path: powershell.exe
+      arguments: Remove-Item -Path WSMan:\localhost\Listener\* -Recurse -Force
+    - path: C:\windows\system32\sysprep\sysprep.exe
+      arguments: /generalize /oobe /quiet /shutdown
+  when:
+    - "'VMware' not in ansible_product_name or target_ovirt | bool"
+
+- name: create scheduled task to delete WinRM listeners and shutdown
+  win_scheduled_task:
+    name: sysprep-shutdown
+    username: SYSTEM
+    disallow_start_if_on_batteries: no
+    stop_if_going_on_batteries: no
+    actions:
+    - path: powershell.exe
+      arguments: Remove-Item -Path WSMan:\localhost\Listener\* -Recurse -Force
+    - path: shutdown.exe
+      arguments: /s /t 10 /f /d p:4:1 /c "Packer Shutdown"
+  when:
+    - "'VMware' in ansible_product_name"
+    - not target_ovirt | bool
+
+- name: set flag to recreate pagefile after next sysprep
+  win_shell: |
+    $system = Get-WmiObject -Class Win32_ComputerSystem -EnableAllPrivileges
+    if ($system -ne $null) {
+        $system.AutomaticManagedPagefile = $true
+        $system.Put()
+    }

@@ -1,0 +1,54 @@
+---
+
+- include_role:
+    name: ovirt-guest-agent
+  when: target_ovirt | bool
+
+- include_tasks: disable-auto-logon.yml
+
+- include_tasks: updates.yml
+  when:
+    - install_updates
+    - "'Windows Server 2012' not in ansible_distribution"
+
+- include_tasks: updates-powershell.yml
+  when:
+    - install_updates
+    - "'Windows Server 2012' in ansible_distribution"
+
+- include_role:
+    name: vmware-tools
+  when: "'VMware' in ansible_product_name"
+
+- include_tasks: startup.yml
+
+- include_tasks: policy.yml
+
+- include_tasks: power.yml
+  when:
+    - "'Windows 10' in ansible_distribution"
+
+- include_tasks: enable-rdp.yml
+
+- include_tasks: cloudbase-init.yml
+  when:
+    - "'VMware' not in ansible_product_name"
+    - not target_ovirt | bool
+
+- include_tasks: remove-apps-alt.yml
+  when:
+    - remove_apps
+    - "'Windows 10' in ansible_distribution"
+
+- include_role:
+    name: ec2-ena-support
+  when: target_ec2 | bool
+
+- include_tasks: clean-up-components.yml
+  when: clean_up_components | bool
+
+- include_tasks: clean-up.yml
+
+- include_tasks: sysprep.yml
+
+- include_tasks: compact.yml

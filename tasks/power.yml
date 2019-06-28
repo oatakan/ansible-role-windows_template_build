@@ -1,0 +1,6 @@
+---
+
+- name: change power plan to high performance
+  win_power_plan:
+    name: high performance
+  ignore_errors: yes

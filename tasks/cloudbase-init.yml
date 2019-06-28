@@ -1,0 +1,9 @@
+---
+
+- name: install cloudbase init package
+  win_package:
+    path: https://cloudbase.it/downloads/CloudbaseInitSetup_x64.msi
+    product_id: '{ED85F19F-057A-4EE6-BC8D-F576DEACE78D}'
+    arguments:
+      - /qn
+    state: present

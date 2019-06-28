@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+    <settings pass="oobeSystem">
+        <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <UserAccounts>
+{% if unattend.administrator_password is defined %}
+                <AdministratorPassword>
+                    <Value>{{ unattend.administrator_password }}</Value>
+                    <PlainText>true</PlainText>
+                </AdministratorPassword>
+{% endif %}
+{% if unattend.local_accounts is defined %}
+                <LocalAccounts>
+{% for local_account in unattend.local_accounts %}
+                    <LocalAccount wcm:action="add">
+{% if local_account.password is defined %}
+                        <Password>
+                            <Value>{{ local_account.password }}</Value>
+                            <PlainText>true</PlainText>
+                        </Password>
+{% endif %}
+{% if local_account.description is defined %}
+                        <Description>{{ local_account.description }}</Description>
+{% endif %}
+{% if local_account.display_name is defined %}
+                        <DisplayName>{{ local_account.display_name }}</DisplayName>
+{% endif %}
+{% if local_account.group is defined %}
+                        <Group>{{ local_account.group }}</Group>
+{% endif %}
+{% if local_account.name is defined %}
+                        <Name>{{ local_account.name }}</Name>
+{% endif %}
+                    </LocalAccount>
+{% endfor %}
+                </LocalAccounts>
+{% endif %}
+            </UserAccounts>
+            <OOBE>
+                <HideEULAPage>true</HideEULAPage>
+                <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+                <NetworkLocation>Home</NetworkLocation>
+                <ProtectYourPC>1</ProtectYourPC>
+                <HideLocalAccountScreen>true</HideLocalAccountScreen>
+                <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+                <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
+                <SkipMachineOOBE>true</SkipMachineOOBE>
+                <SkipUserOOBE>true</SkipUserOOBE>
+            </OOBE>
+{% if enable_auto_logon and unattend.local_accounts and unattend.local_accounts[0].name and unattend.local_accounts[0].password %}
+            <AutoLogon>
+                <Password>
+                    <Value>{{ unattend.local_accounts[0].password }}</Value>
+                    <PlainText>true</PlainText>
+                </Password>
+                <Username>{{ unattend.local_accounts[0].name }}</Username>
+                <Enabled>true</Enabled>
+            </AutoLogon>
+{% endif %}
+            <FirstLogonCommands>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "& $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1'))) -ForceNewSSLCert -EnableCredSSP"</CommandLine>
+                    <Description>Enable winrm</Description>
+                    <Order>1</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "Enable-WSManCredSSP -Role Server -Force"</CommandLine>
+                    <Description>Enable winrm server role</Description>
+                    <Order>2</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "Set-Item -Path 'WSMan:\localhost\Service\Auth\CredSSP' -Value $true"</CommandLine>
+                    <Description>Enable credssp authentication</Description>
+                    <Order>3</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+            </FirstLogonCommands>
+            <ShowWindowsLive>false</ShowWindowsLive>
+        </component>
+    </settings>
+    <settings pass="specialize">
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <OEMInformation>
+                <HelpCustomized>false</HelpCustomized>
+            </OEMInformation>
+            <!-- Rename computer here. -->
+            <ComputerName>{{ settings.computer_name | default('windows') }}</ComputerName>
+            <TimeZone>{{ settings.time_zone | default('Central Standard Time') }}</TimeZone>
+            <RegisteredOwner/>
+        </component>
+        <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-Security-SPP-UX" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <SkipAutoActivation>{{ settings.skip_auto_activation | default('true') }}</SkipAutoActivation>
+        </component>
+    </settings>
+    <cpi:offlineImage xmlns:cpi="urn:schemas-microsoft-com:cpi" cpi:source="catalog:d:/sources/install_windows 7 ENTERPRISE.clg"/>
+</unattend>

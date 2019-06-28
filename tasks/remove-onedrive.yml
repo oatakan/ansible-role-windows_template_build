@@ -1,0 +1,29 @@
+---
+
+- name: kill onedrive process
+  win_shell: Stop-Process -Name OneDrive
+  ignore_errors: yes
+
+- name: uninstall onedrive
+  win_shell: '{{ ansible_env.SystemRoot }}\SysWOW64\OneDriveSetup.exe /uninstall'
+  ignore_errors: yes
+
+- name: remove onedrive directories
+  win_file:
+    path: '{{ item }}'
+    state: absent
+  ignore_errors: yes
+  loop:
+    - '{{ ansible_env.USERPROFILE }}\OneDrive'
+    - '{{ ansible_env.LOCALAPPDATA }}\Microsoft\OneDrive'
+    - '{{ ansible_env.ProgramData }}\Microsoft OneDrive'
+    - C:\OneDriveTemp
+
+- name: delete registry keys
+  win_regedit:
+    path: '{{ item }}'
+    state: absent
+    delete_key: yes
+  loop:
+    - HKCR:\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}
+    - HKCR:\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}
