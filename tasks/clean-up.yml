@@ -14,7 +14,7 @@
 
 - name: cleanup the temp folders
   win_file:
-    path: '{{item}}'
+    path: '{{ item }}'
     state: absent
   ignore_errors: yes
   loop:
