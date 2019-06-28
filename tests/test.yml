@@ -7,4 +7,4 @@
     ansible_winrm_transport: credssp
     ansible_winrm_server_cert_validation: ignore
   roles:
-    - ansible-role-windows-template-build
+    - ansible-role-windows_template_build

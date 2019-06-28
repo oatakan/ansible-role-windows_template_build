@@ -2,6 +2,7 @@
 galaxy_info:
   author: Orcun Atakan
   description: Ansible galaxy role for building a Windows template on any cloud platform(ovirt/rhev, VMware, EC2, Azure etc.)
+  role_name: windows_template_build
   company: Red Hat
 
   license: MIT

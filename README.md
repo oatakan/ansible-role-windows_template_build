@@ -1,4 +1,4 @@
-# ansible-role-windows-template-build
+# windows_template_build
 This repo contains an Ansible role that build a Windows template on any cloud platform(ovirt/rhev, VMware, EC2, Azure etc.)
 You can run this role as part of VMware template build role or packer role as part of CI/CD pipeline for building Windows templates.
 
