@@ -14,6 +14,12 @@ enable_auto_logon: no
 target_ovirt: no
 target_ec2: no
 
+ec2_ena_driver_role: oatakan.windows_ec2_ena_driver
+ovirt_guest_agent_role: oatakan.windows_ovirt_guest_agent
+vmware_tools_role: oatakan.windows_vmware_tools
+
+
+
 policy:
   allow_unauthenticated_guest_access: no
 

@@ -4,7 +4,7 @@
   setup:
 
 - include_role:
-    name: ovirt-guest-agent
+    name: "{{ ovirt_guest_agent_role }}"
   when: target_ovirt | bool
 
 - include_tasks: disable-auto-logon.yml
@@ -20,7 +20,7 @@
     - "'Windows Server 2012' in ansible_distribution"
 
 - include_role:
-    name: vmware-tools
+    name: "{{ vmware_tools_role }}"
   when: "'VMware' in ansible_product_name"
 
 - include_tasks: startup.yml
@@ -44,7 +44,7 @@
     - "'Windows 10' in ansible_distribution"
 
 - include_role:
-    name: ec2-ena-support
+    name: "{{ ec2_ena_driver_role }}"
   when: target_ec2 | bool
 
 - include_tasks: clean-up-components.yml
