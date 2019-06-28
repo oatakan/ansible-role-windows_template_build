@@ -19,10 +19,10 @@ Dependencies
 
 A list of roles that this role utilizes:
 
-- oatakan.windows-ec2-ena-support
-- oatakan.windows-ovirt-guest-agent
-- oatakan.windows-virtio
-- oatakan.windows-vmware-tools
+- oatakan.windows_ec2_ena_support
+- oatakan.windows_ovirt_guest_agent
+- oatakan.windows_virtio
+- oatakan.windows_vmware_tools
 
 Example Playbook
 ----------------
@@ -31,7 +31,7 @@ Including an example of how to use your role (for instance, with variables passe
 
     - hosts: servers
       roles:
-         - oatakan.windows-template-build
+         - oatakan.windows_template_build
 
 License
 -------

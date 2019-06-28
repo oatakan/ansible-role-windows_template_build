@@ -36,7 +36,7 @@ galaxy_info:
     - template
 
 dependencies:
-  - src: oatakan.windows-ec2-ena-support
-  - src: oatakan.windows-ovirt-guest-agent
-  - src: oatakan.windows-virtio
-  - src: oatakan.windows-vmware-tools
+  - oatakan.windows_ec2_ena_support
+  - oatakan.windows_ovirt_guest_agent
+  - oatakan.windows_virtio
+  - oatakan.windows_vmware_tools
