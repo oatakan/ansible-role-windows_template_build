@@ -1,5 +1,8 @@
 ---
 
+- name: run setup module
+  setup:
+
 - include_role:
     name: ovirt-guest-agent
   when: target_ovirt | bool
