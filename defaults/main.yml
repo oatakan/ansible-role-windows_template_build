@@ -17,8 +17,7 @@ target_ec2: no
 ec2_ena_driver_role: oatakan.windows_ec2_ena_driver
 ovirt_guest_agent_role: oatakan.windows_ovirt_guest_agent
 vmware_tools_role: oatakan.windows_vmware_tools
-
-
+virtualbox_guest_additions_role: oatakan.windows_virtualbox_guest_additions
 
 policy:
   allow_unauthenticated_guest_access: no
