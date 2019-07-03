@@ -9,10 +9,11 @@ temp_directory: "{{ ansible_env.TEMP }}"
 sdelete_download_url: https://download.sysinternals.com/files/SDelete.zip
 ultradefrag_download_url: http://downloads.sourceforge.net/project/ultradefrag/stable-release/6.1.0/ultradefrag-portable-6.1.0.bin.amd64.zip
 
-enable_auto_logon: no
+enable_auto_logon: yes
 
 target_ovirt: no
 target_ec2: no
+target_vagrant: no
 
 ec2_ena_driver_role: oatakan.windows_ec2_ena_driver
 ovirt_guest_agent_role: oatakan.windows_ovirt_guest_agent
