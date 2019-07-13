@@ -40,11 +40,12 @@
 - include_tasks: cloudbase-init.yml
   when:
     - "'VMware' not in ansible_product_name"
+    - "'VirtualBox' not in ansible_product_name"
     - not target_ovirt | bool
 
 - include_tasks: remove-apps-alt.yml
   when:
-    - remove_apps
+    - remove_apps | bool
     - "'Windows 10' in ansible_distribution"
 
 - include_role:
