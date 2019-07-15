@@ -1,44 +1,19 @@
 ---
 
-- name: create temp directory
-  win_file:
-    path: '{{ temp_directory }}\win_build'
-    state: directory
-
-- name: download sdelete
+- name: download bleachbit
   win_get_url:
-    url: '{{ sdelete_download_url }}'
-    dest: '{{ temp_directory }}\win_build\SDelete.zip'
-  register: download_sdelete
-  until: download_sdelete is success
+    url: '{{ bleachbit_download_url }}'
+    dest: '{{ temp_directory }}\BleachBit-portable.zip'
+  register: download_bleachbit
+  until: download_bleachbit is success
   delay: 3
   retries: 5
-  when: sdelete_download_url is defined
+  when: bleachbit_download_url is defined
 
-- name: copy sdelete
-  win_copy:
-    src: SDelete.zip
-    dest: '{{ temp_directory }}\win_build\SDelete.zip'
-  when: sdelete_download_url is undefined
-
-- name: unzip sdelete
+- name: unzip bleachbit
   win_unzip:
-    src: '{{ temp_directory }}\win_build\SDelete.zip'
-    dest: '{{ temp_directory }}\win_build'
-
-- name: download ultradefrag
-  win_get_url:
-    url: '{{ ultradefrag_download_url }}'
-    dest: '{{ temp_directory }}\win_build\ultradefrag.zip'
-  register: download_ultradefrag
-  until: download_ultradefrag is success
-  delay: 3
-  retries: 5
-
-- name: unzip ultradefrag
-  win_unzip:
-    src: '{{ temp_directory }}\win_build\ultradefrag.zip'
-    dest: '{{ temp_directory }}\win_build'
+    src: '{{ temp_directory }}\BleachBit-portable.zip'
+    dest: '{{ ansible_user_dir }}'
 
 - name: stop windows update service
   win_service:
@@ -64,6 +39,30 @@
     state: directory
   ignore_errors: yes
 
+- name: clean with bleachbit
+  win_shell: '{{ ansible_user_dir }}\BleachBit-Portable\bleachbit_console.exe --clean deepscan.backup deepscan.ds_store deepscan.thumbs_db deepscan.tmp internet_explorer.cookies internet_explorer.forms internet_explorer.history internet_explorer.temporary_files system.clipboard system.custom system.logs system.memory_dump system.muicache system.prefetch system.recycle_bin system.tmp system.updates windows_defender.history windows_explorer.mru windows_explorer.recent_documents windows_explorer.run windows_explorer.search_history windows_explorer.thumbnails > NUL'
+  args:
+    executable: cmd
+
+- name: create temp directory
+  win_file:
+    path: '{{ temp_directory }}\win_build'
+    state: directory
+
+- name: download ultradefrag
+  win_get_url:
+    url: '{{ ultradefrag_download_url }}'
+    dest: '{{ temp_directory }}\win_build\ultradefrag.zip'
+  register: download_ultradefrag
+  until: download_ultradefrag is success
+  delay: 3
+  retries: 5
+
+- name: unzip ultradefrag
+  win_unzip:
+    src: '{{ temp_directory }}\win_build\ultradefrag.zip'
+    dest: '{{ temp_directory }}\win_build'
+
 - name: set udefrag extract directory
   set_fact:
     udefrag_dir: '{{ temp_directory }}\win_build\ultradefrag-portable-6.1.0.amd64'
@@ -72,6 +71,27 @@
   win_shell: '{{ udefrag_dir }}\udefrag.exe --optimize --repeat C:'
   args:
     executable: cmd
+
+- name: download sdelete
+  win_get_url:
+    url: '{{ sdelete_download_url }}'
+    dest: '{{ temp_directory }}\win_build\SDelete.zip'
+  register: download_sdelete
+  until: download_sdelete is success
+  delay: 3
+  retries: 5
+  when: sdelete_download_url is defined
+
+- name: copy sdelete
+  win_copy:
+    src: SDelete.zip
+    dest: '{{ temp_directory }}\win_build\SDelete.zip'
+  when: sdelete_download_url is undefined
+
+- name: unzip sdelete
+  win_unzip:
+    src: '{{ temp_directory }}\win_build\SDelete.zip'
+    dest: '{{ temp_directory }}\win_build'
 
 - name: accept sdelete eula
   win_regedit:
@@ -88,4 +108,14 @@
 - name: remove temp files
   win_file:
     path: '{{ temp_directory }}\win_build'
+    state: absent
+
+- name: free disk space with bleachbit
+  win_shell: '{{ ansible_user_dir }}\BleachBit-Portable\bleachbit_console.exe --clean system.free_disk_space'
+  args:
+    executable: cmd
+
+- name: remove bleachbit files
+  win_file:
+    path: '{{ ansible_user_dir }}\BleachBit-Portable'
     state: absent

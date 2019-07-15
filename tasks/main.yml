@@ -43,7 +43,7 @@
     - "'VirtualBox' not in ansible_product_name"
     - not target_ovirt | bool
 
-- include_tasks: remove-apps-alt.yml
+- include_tasks: remove-apps-alt-2.yml
   when:
     - remove_apps | bool
     - "'Windows 10' in ansible_distribution"
