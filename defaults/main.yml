@@ -23,23 +23,6 @@ virtualbox_guest_additions_role: oatakan.windows_virtualbox_guest_additions
 policy:
   allow_unauthenticated_guest_access: no
 
-unattend:
-  administrator_password: Chang3MyP@ssw0rd21
-  local_accounts:
-    - name: ansible
-      display_name: ansible
-      description: ansible user
-      group: Administrators
-      password: Chang3MyP@ssw0rd21
-  settings:
-    computer_name: wintemp
-    time_zone: Central Standard Time
-    skip_auto_activation: true
-
-autologin_registry:
-  - name: AutoAdminLogon
-    data: 1
-  - name: DefaultUserName
-    data: "{{ unattend.local_accounts[0].name }}"
-  - name: DefaultPassword
-    data: "{{ unattend.local_accounts[0].password }}"
+local_administrator_password: Chang3MyP@ssw0rd21
+local_account_username: ansible
+local_account_password: Chang3MyP@ssw0rd21

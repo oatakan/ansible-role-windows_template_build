@@ -1,0 +1,22 @@
+---
+
+unattend:
+  administrator_password: "{{ local_administrator_password }}"
+  local_accounts:
+    - name: "{{ local_account_username }}"
+      display_name: "{{ local_account_username }}"
+      description: "{{ local_account_username }} user"
+      group: Administrators
+      password: "{{ local_account_password }}"
+  settings:
+    computer_name: wintemp
+    time_zone: Central Standard Time
+    skip_auto_activation: true
+
+autologin_registry:
+  - name: AutoAdminLogon
+    data: 1
+  - name: DefaultUserName
+    data: "{{ unattend.local_accounts[0].name }}"
+  - name: DefaultPassword
+    data: "{{ unattend.local_accounts[0].password }}"
