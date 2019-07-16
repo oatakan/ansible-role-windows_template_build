@@ -1,14 +1,9 @@
 ---
 
-- name: create temp directory
-  win_file:
-    path: '{{ temp_directory }}\win_build'
-    state: directory
-
 - name: download bleachbit
   win_get_url:
     url: '{{ bleachbit_download_url }}'
-    dest: '{{ temp_directory }}\win_build\BleachBit-portable.zip'
+    dest: '{{ temp_directory }}\BleachBit-portable.zip'
   register: download_bleachbit
   until: download_bleachbit is success
   delay: 3
@@ -17,7 +12,7 @@
 
 - name: unzip bleachbit
   win_unzip:
-    src: '{{ temp_directory }}\win_build\BleachBit-portable.zip'
+    src: '{{ temp_directory }}\BleachBit-portable.zip'
     dest: '{{ ansible_user_dir }}'
   when: download_bleachbit is success
 
@@ -50,6 +45,11 @@
   args:
     executable: cmd
   when: download_bleachbit is success
+
+- name: create temp directory
+  win_file:
+    path: '{{ temp_directory }}\win_build'
+    state: directory
 
 - name: download ultradefrag
   win_get_url:
