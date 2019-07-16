@@ -6,6 +6,7 @@ clean_up_components: yes
 temp_directory: "{{ ansible_env.TEMP }}"
 
 #sdelete_download_url: http://web.archive.org/web/20140902022253/http://download.sysinternals.com/files/SDelete.zip
+bleachbit_download_url: https://download.bleachbit.org/BleachBit-2.2-portable.zip
 sdelete_download_url: https://download.sysinternals.com/files/SDelete.zip
 ultradefrag_download_url: http://downloads.sourceforge.net/project/ultradefrag/stable-release/6.1.0/ultradefrag-portable-6.1.0.bin.amd64.zip
 
