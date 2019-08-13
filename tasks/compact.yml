@@ -1,5 +1,10 @@
 ---
 
+- name: ensure temp directory exists
+  win_file:
+    path: '{{ temp_directory }}'
+    state: directory
+
 - name: download bleachbit
   win_get_url:
     url: '{{ bleachbit_download_url }}'
