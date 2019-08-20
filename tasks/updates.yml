@@ -1,12 +1,7 @@
 ---
 
 - name: disable firewall for Domain, Public and Private profiles
-  win_firewall:
-    state: disabled
-    profiles:
-    - Domain
-    - Private
-    - Public
+  win_shell: Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
   when: "'Windows Server 2012' in ansible_distribution"
 
 - block:
