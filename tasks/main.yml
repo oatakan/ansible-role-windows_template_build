@@ -16,12 +16,12 @@
 - include_tasks: updates.yml
   when:
     - install_updates | bool
-    - "'Windows Server 2012' not in ansible_distribution"
-
-- include_tasks: updates-powershell.yml
-  when:
-    - install_updates | bool
-    - "'Windows Server 2012' in ansible_distribution"
+#    - "'Windows Server 2012' not in ansible_distribution"
+#
+#- include_tasks: updates-powershell.yml
+#  when:
+#    - install_updates | bool
+#    - "'Windows Server 2012' in ansible_distribution"
 
 - include_role:
     name: "{{ vmware_tools_role }}"
