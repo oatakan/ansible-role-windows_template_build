@@ -80,3 +80,7 @@
     - name: reboot windows
       win_reboot:
       when: "'Windows 10' in ansible_distribution"
+
+- name: enabled firewall for Domain, Public and Private profiles
+  win_shell: Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
+  when: "'Windows Server 2012' in ansible_distribution"
