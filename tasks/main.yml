@@ -1,5 +1,12 @@
 ---
 
+- name: list user accounts on a Windows system
+  raw: Get-WmiObject -Class Win32_UserAccount
+  register: user_accounts_on_system
+
+- debug:
+    var: user_accounts_on_system
+
 - name: run setup module
   setup:
 
