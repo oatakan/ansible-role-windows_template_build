@@ -2,6 +2,10 @@
 
 - name: run setup module
   setup:
+  register: run_setup
+  until: run_setup is success
+  delay: 30
+  retries: 15
 
 - include_role:
     name: "{{ ovirt_guest_agent_role }}"
