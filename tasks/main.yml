@@ -1,11 +1,7 @@
 ---
 
-- name: list user accounts on a Windows system
-  raw: Get-WmiObject -Class Win32_UserAccount
-  register: user_accounts_on_system
-
-- debug:
-    var: user_accounts_on_system
+- include_tasks: powershell-update.yml
+  when: update_powershell | bool
 
 - name: run setup module
   setup:
@@ -21,8 +17,7 @@
 - include_tasks: disable-auto-logon.yml
 
 - include_tasks: updates.yml
-  when:
-    - install_updates | bool
+  when: install_updates | bool
 
 - include_role:
     name: "{{ vmware_tools_role }}"
@@ -33,8 +28,7 @@
 - include_tasks: policy.yml
 
 - include_tasks: power.yml
-  when:
-    - "'Windows 10' in ansible_distribution"
+  when: "'Windows 10' in ansible_distribution"
 
 - include_tasks: enable-rdp.yml
 

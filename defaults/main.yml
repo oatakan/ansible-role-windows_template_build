@@ -3,6 +3,7 @@
 install_updates: yes
 remove_apps: no
 clean_up_components: yes
+update_powershell: no
 temp_directory: "{{ ansible_env.TEMP }}"
 
 #sdelete_download_url: http://web.archive.org/web/20140902022253/http://download.sysinternals.com/files/SDelete.zip
