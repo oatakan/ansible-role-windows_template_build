@@ -3,11 +3,16 @@
 - name: update powershell
   raw: "& $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/jborean93/ansible-windows/master/scripts/Upgrade-PowerShell.ps1'))) -Version 3.0 -Username {{ ansible_user }} -Password {{ ansible_password }}"
   register: update_powershell_command
+  ignore_errors: yes
 
 - debug:
     var: update_powershell_command
 
+- name: reboot host
+  raw: Restart-Computer
+  ignore_errors: yes
+
 - name: wait for system to reboot after upgrade
   wait_for_connection:
-    delay: 240
+    delay: 30
     timeout: 300
