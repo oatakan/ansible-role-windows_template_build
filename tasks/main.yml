@@ -1,7 +1,7 @@
 ---
 
-- include_tasks: powershell-update.yml
-  when: update_powershell | bool
+- include_tasks: powershell-upgrade.yml
+  when: upgrade_powershell | bool
 
 - name: run setup module
   setup:
@@ -17,7 +17,14 @@
 - include_tasks: disable-auto-logon.yml
 
 - include_tasks: updates.yml
-  when: install_updates | bool
+  when:
+    - install_updates | bool
+    - "'Windows Server 2008' not in ansible_distribution"
+
+- include_tasks: updates-powershell.yml
+  when:
+    - install_updates | bool
+    - "'Windows Server 2008' in ansible_distribution"
 
 - include_role:
     name: "{{ vmware_tools_role }}"
