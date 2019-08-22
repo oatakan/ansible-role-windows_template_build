@@ -1,0 +1,64 @@
+---
+
+- name: ensure Windows ADK with DISM is installed
+  win_chocolatey:
+    name: windows-adk-deploy
+    state: present
+    version: 10.0.17134.0
+  register: install_windows_adk_deploy
+
+- name: ensure PATH contains Windows ADK
+  win_path:
+    scope: machine
+    state: present
+    elements: "C:\\Program Files (x86)\\Windows Kits\\10\\Assessment and Deployment Kit\\Deployment Tools\\amd64\\DISM"
+
+- name: download hotfix
+  win_get_url:
+    url: '{{ enable_tlsv12_hotfix.url }}'
+    dest: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }}'
+
+- name: install hotfix
+  win_hotfix:
+    source: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }}'
+    state: present
+  register: hotfix_install
+
+- name: debug hotfix installation result
+  debug:
+    var: hotfix_install
+
+- name: ensure hotfix file is removed
+  win_file:
+    path: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }}'
+    state: absent
+
+- name: reboot if needed
+  win_reboot:
+  when: hotfix_install.reboot_required
+
+- name: enable TLSv1.2 support
+  win_regedit:
+    path: HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\{{ item.type }}
+    name: '{{ item.property }}'
+    data: '{{ item.value }}'
+    type: dword
+    state: present
+  register: enable_tls12
+  loop:
+    - type: Server
+      property: Enabled
+      value: 1
+    - type: Server
+      property: DisabledByDefault
+      value: 0
+    - type: Client
+      property: Enabled
+      value: 1
+    - type: Client
+      property: DisabledByDefault
+      value: 0
+
+- name: reboot if TLS config was applied
+  win_reboot:
+  when: enable_tls12 is changed
