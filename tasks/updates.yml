@@ -8,82 +8,15 @@
   win_shell: netsh advfirewall set  allprofiles state off
   when: "'Windows Server 2008' in ansible_distribution"
 
-- block:
+- include_tasks: updates-all.yml
+  when:
+    - install_updates | bool
+    - "'Windows Server 2008' not in ansible_distribution"
 
-    - name: check for missing updates.
-      win_updates:
-        state: searched
-      register: update_count
-
-    - name: list missing updates
-      debug:
-        var: update_count
-
-    - name: install all windows updates
-      win_updates:
-        category_names:
-          - CriticalUpdates
-          - DefinitionUpdates
-          - SecurityUpdates
-          - UpdateRollups
-          - Updates
-        reboot: yes
-      when: update_count.found_update_count|int >= 1
-
-  rescue:
-    - block:
-        - name: reboot if update failed
-          win_reboot:
-            reboot_timeout: 7200
-
-        - name: install all windows updates (retry)
-          win_updates:
-            category_names:
-              - CriticalUpdates
-              - DefinitionUpdates
-              - SecurityUpdates
-              - UpdateRollups
-              - Updates
-            reboot: yes
-
-      rescue:
-        - name: reboot if update failed (2)
-          win_reboot:
-            reboot_timeout: 7200
-
-        - name: install all windows updates (retry 2)
-          win_updates:
-            category_names:
-              - CriticalUpdates
-              - DefinitionUpdates
-              - SecurityUpdates
-              - UpdateRollups
-              - Updates
-            reboot: yes
-
-  always:
-
-    - name: check for missing updates.
-      win_updates:
-        state: searched
-      register: update_count
-
-    - name: list missing updates
-      debug:
-        var: update_count
-
-    - name: check to see if update is finished
-      win_shell: gwmi -Class win32_computersystem -ComputerName 127.0.0.1 | select -ExpandProperty username -ErrorAction Stop
-      register: logon_status
-      until: logon_status is success
-      delay: 10
-      retries: 100
-      ignore_errors: yes
-      when: "'Windows 10' in ansible_distribution"
-
-    - name: reboot windows
-      win_reboot:
-      when: "'Windows 10' in ansible_distribution"
+- include_tasks: updates-powershell.yml
+  when:
+    - install_updates | bool
+    - "'Windows Server 2008' in ansible_distribution"
 
 - name: enabled firewall for Domain, Public and Private profiles
   win_shell: Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
