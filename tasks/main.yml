@@ -3,11 +3,11 @@
 - include_tasks: powershell-upgrade.yml
   when: upgrade_powershell | bool
 
-- include_tasks: enable-tlsv12.yml
-  when: upgrade_powershell | bool
-
 - name: run setup module
   setup:
+
+- include_tasks: enable-tlsv12.yml
+  when: upgrade_powershell | bool
 
 - include_role:
     name: "{{ ovirt_guest_agent_role }}"
