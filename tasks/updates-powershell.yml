@@ -2,3 +2,6 @@
 
 - name: install windows update using powershell script
   script: win-updates.ps1
+  become: yes
+  become_method: runas
+  become_user: SYSTEM

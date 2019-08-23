@@ -8,15 +8,36 @@
   win_shell: netsh advfirewall set  allprofiles state off
   when: "'Windows Server 2008' in ansible_distribution"
 
+- name: update Windows Update Agent on 2008
+  win_package:
+    path: http://download.windowsupdate.com/windowsupdate/redist/standalone/7.6.7600.320/windowsupdateagent-7.6-x64.exe
+    arguments:
+      - /quiet
+      - /norestart
+      - /wuforce
+    creates_path: C:\Windows\System32\wuaueng.dll
+    creates_version: 7.6.7600.320
+
 - include_tasks: updates-all.yml
   when:
     - install_updates | bool
     - "'Windows Server 2008' not in ansible_distribution"
 
-- include_tasks: updates-powershell.yml
+- include_tasks:
+    file: updates-all.yml
+    apply:
+      become: yes
+      become_method: runas
+      become_user: SYSTEM
   when:
     - install_updates | bool
     - "'Windows Server 2008' in ansible_distribution"
+
+#
+#- include_tasks: updates-powershell.yml
+#  when:
+#    - install_updates | bool
+#    - "'Windows Server 2008' in ansible_distribution"
 
 - name: enabled firewall for Domain, Public and Private profiles
   win_shell: Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
