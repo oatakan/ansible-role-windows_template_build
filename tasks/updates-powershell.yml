@@ -1,7 +1,21 @@
 ---
 
-- name: install windows update using powershell script
-  script: win-updates.ps1
-  become: yes
-  become_method: runas
-  become_user: SYSTEM
+- block:
+
+    - name: install windows update using powershell script
+      script: win-updates.ps1
+      become: yes
+      become_method: runas
+      become_user: SYSTEM
+
+  rescue:
+    - block:
+        - name: reboot if update failed
+          win_reboot:
+            reboot_timeout: 7200
+
+        - name: install windows update using powershell script
+          script: win-updates.ps1
+          become: yes
+          become_method: runas
+          become_user: SYSTEM
