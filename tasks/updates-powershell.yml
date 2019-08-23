@@ -2,6 +2,25 @@
 
 - block:
 
+    - name: check for available updates
+      win_updates:
+        category_names:
+          - CriticalUpdates
+          - DefinitionUpdates
+          - SecurityUpdates
+          - UpdateRollups
+          - Updates
+        state: searched
+      register: available_updates
+
+    - debug:
+        msg: |
+          {{ inventory_hostname }} has {{ available_updates.found_update_count }} updates available.
+          {% for key, value in available_updates.updates.items() %}
+            - {{ value.title }}
+          {% endfor %}
+      when: available_updates.updates is defined
+
     - name: install windows update using powershell script
       script: win-updates.ps1
       become: yes
@@ -9,13 +28,36 @@
       become_user: SYSTEM
 
   rescue:
-    - block:
-        - name: reboot if update failed
-          win_reboot:
-            reboot_timeout: 7200
+    - name: reboot if update failed
+      win_reboot:
+        reboot_timeout: 7200
 
-        - name: install windows update using powershell script
-          script: win-updates.ps1
-          become: yes
-          become_method: runas
-          become_user: SYSTEM
+    - name: install windows update using powershell script
+      script: win-updates.ps1
+      become: yes
+      become_method: runas
+      become_user: SYSTEM
+
+  always:
+    - name: reboot host
+      win_reboot:
+        reboot_timeout: 7200
+
+    - name: check for missing updates
+      win_updates:
+        category_names:
+          - CriticalUpdates
+          - DefinitionUpdates
+          - SecurityUpdates
+          - UpdateRollups
+          - Updates
+        state: searched
+      register: missing_updates
+
+    - debug:
+        msg: |
+          {{ inventory_hostname }} has {{ missing_updates.found_update_count }} updates still missing.
+          {% for key, value in missing_updates.updates.items() %}
+            - {{ value.title }}
+          {% endfor %}
+      when: missing_updates.updates is defined
