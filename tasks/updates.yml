@@ -23,21 +23,20 @@
     - install_updates | bool
     - "'Windows Server 2008' not in ansible_distribution"
 
-- include_tasks:
-    file: updates-all.yml
-    apply:
-      become: yes
-      become_method: runas
-      become_user: SYSTEM
-  when:
-    - install_updates | bool
-    - "'Windows Server 2008' in ansible_distribution"
-
-#
-#- include_tasks: updates-powershell.yml
+#- include_tasks:
+#    file: updates-all.yml
+#    apply:
+#      become: yes
+#      become_method: runas
+#      become_user: SYSTEM
 #  when:
 #    - install_updates | bool
 #    - "'Windows Server 2008' in ansible_distribution"
+
+- include_tasks: updates-powershell.yml
+  when:
+    - install_updates | bool
+    - "'Windows Server 2008' in ansible_distribution"
 
 - name: enabled firewall for Domain, Public and Private profiles
   win_shell: Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
