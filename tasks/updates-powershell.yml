@@ -116,4 +116,4 @@
 
       when:
         - missing_updates.updates is defined
-        - missing_updates.updates.items|length > 0
+        - missing_updates.found_update_count > 0
