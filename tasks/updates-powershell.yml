@@ -21,31 +21,31 @@
           {% endfor %}
       when: available_updates.updates is defined
 
-    - name: install windows update using powershell script
+    - name: install windows update using powershell script (1/2)
       script: win-updates.ps1
       become: yes
       become_method: runas
       become_user: SYSTEM
 
   rescue:
-    - name: reboot host
+    - name: reboot host (1/2 - retry)
       win_reboot:
         reboot_timeout: 7200
 
-    - name: install windows update using powershell script
+    - name: install windows update using powershell script (1/2 - retry)
       script: win-updates.ps1
       become: yes
       become_method: runas
       become_user: SYSTEM
 
   always:
-    - name: wait for system to be up after upgrade
+    - name: wait for system to be up after upgrade (1/2)
       wait_for_connection:
         delay: 300
         sleep: 30
         timeout: 600
 
-    - name: check for missing updates
+    - name: check for missing updates (1/2)
       win_updates:
         category_names:
           - CriticalUpdates
@@ -63,3 +63,57 @@
             - {{ value.title }}
           {% endfor %}
       when: missing_updates.updates is defined
+
+    # let's try another round of updates if there is still any missing updates
+    - block:
+
+        - name: reboot host (2/2)
+          win_reboot:
+            reboot_timeout: 7200
+
+        - name: install windows update using powershell script (2/2)
+          script: win-updates.ps1
+          become: yes
+          become_method: runas
+          become_user: SYSTEM
+
+      rescue:
+        - name: reboot host (2/2 - retry)
+          win_reboot:
+            reboot_timeout: 7200
+
+        - name: install windows update using powershell script (2/2 - retry)
+          script: win-updates.ps1
+          become: yes
+          become_method: runas
+          become_user: SYSTEM
+
+      always:
+        - name: wait for system to be up after upgrade (2/2)
+          wait_for_connection:
+            delay: 300
+            sleep: 30
+            timeout: 600
+
+        - name: check for missing updates (2/2)
+          win_updates:
+            category_names:
+              - CriticalUpdates
+              - DefinitionUpdates
+              - SecurityUpdates
+              - UpdateRollups
+              - Updates
+            state: searched
+          register: missing_updates_2
+
+        - debug:
+            msg: |
+              {{ inventory_hostname }} has {{ missing_updates_2.found_update_count }} updates still missing.
+              {% for key, value in missing_updates_2.updates.items() %}
+                - {{ value.title }}
+              {% endfor %}
+          when: missing_updates_2.updates is defined
+
+      when:
+        - missing_updates.updates is defined
+        - missing_updates.updates.items|length > 0
