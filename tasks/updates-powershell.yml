@@ -28,9 +28,11 @@
       become_user: SYSTEM
 
   rescue:
-    - name: reboot if update failed
-      win_reboot:
-        reboot_timeout: 7200
+    - name: wait for system to reboot after upgrade
+      wait_for_connection:
+        delay: 30
+        sleep: 5
+        timeout: 300
 
     - name: install windows update using powershell script
       script: win-updates.ps1
