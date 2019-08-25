@@ -23,16 +23,6 @@
     - install_updates | bool
     - "'Windows Server 2008' not in ansible_distribution"
 
-#- include_tasks:
-#    file: updates-all.yml
-#    apply:
-#      become: yes
-#      become_method: runas
-#      become_user: SYSTEM
-#  when:
-#    - install_updates | bool
-#    - "'Windows Server 2008' in ansible_distribution"
-
 - include_tasks: updates-powershell.yml
   when:
     - install_updates | bool

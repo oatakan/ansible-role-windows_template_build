@@ -13,8 +13,8 @@ function LogWrite {
 }
 
 function Check-ContinueRestartOrEnd() {
-    $RegistryKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
-    $RegistryEntry = "InstallWindowsUpdates"
+    $RegistryKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update"
+    $RegistryEntry = "CustomRebootRequired"
     switch ($global:RestartRequired) {
         0 {
             $prop = (Get-ItemProperty $RegistryKey).$RegistryEntry
@@ -38,13 +38,13 @@ function Check-ContinueRestartOrEnd() {
             $prop = (Get-ItemProperty $RegistryKey).$RegistryEntry
             if (-not $prop) {
                 LogWrite "Restart Registry Entry Does Not Exist - Creating It"
-                Set-ItemProperty -Path $RegistryKey -Name $RegistryEntry -Value "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File $($script:ScriptPath) -MaxUpdatesPerCycle $($MaxUpdatesPerCycle)"
+                Set-ItemProperty -Path $RegistryKey -Name $RegistryEntry -Value "1"
             } else {
                 LogWrite "Restart Registry Entry Exists Already"
             }
 
-            LogWrite "Restart Required - Restarting..."
-            Restart-Computer
+            #LogWrite "Restart Required - Restarting..."
+            #Restart-Computer
         }
         default {
             LogWrite "Unsure If A Restart Is Required"
@@ -227,4 +227,3 @@ if ($global:MoreUpdates -eq 1) {
 } else {
     Check-ContinueRestartOrEnd
 }
-
