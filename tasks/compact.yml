@@ -21,11 +21,11 @@
     dest: '{{ ansible_user_dir }}'
   when: download_bleachbit is success
 
-# This is needed on 2008
+# This is needed on 2008 for bleachbit to work
 - name: install the visual C libraries
   win_package:
-    path: https://download.microsoft.com/download/1/1/1/1116b75a-9ec3-481a-a3c8-1777b5381140/vcredist_x86.exe
-    product_id: '{FF66E9F6-83E7-3A3E-AF14-8DE9A809A6A4}'
+    path: https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe
+    product_id: '{9BE518E6-ECC6-35A9-88E4-87755C07200F}'
     arguments: '/qb!'
   when: "'Windows Server 2008' in ansible_distribution"
 
@@ -138,10 +138,3 @@
     path: '{{ ansible_user_dir }}\BleachBit-Portable'
     state: absent
   when: download_bleachbit is success
-
-# This is needed on 2008, cleaning up..
-- name: uninstall visual c library
-  win_package:
-    product_id: '{FF66E9F6-83E7-3A3E-AF14-8DE9A809A6A4}'
-    state: absent
-  when: "'Windows Server 2008' in ansible_distribution"
