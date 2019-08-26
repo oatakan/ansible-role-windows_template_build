@@ -6,7 +6,7 @@ clean_up_components: yes
 upgrade_powershell: no
 powershell_target_version: 4.0
 temp_directory: "{{ ansible_env.TEMP }}"
-update_retry_count: 10
+update_retry_limit: 10
 
 powershell_script_url: https://raw.githubusercontent.com/jborean93/ansible-windows/master/scripts/Upgrade-PowerShell.ps1
 powershell_upgrade_script_file: 'C:\Upgrade-PowerShell.ps1'
