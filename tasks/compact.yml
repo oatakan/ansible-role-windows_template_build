@@ -21,6 +21,14 @@
     dest: '{{ ansible_user_dir }}'
   when: download_bleachbit is success
 
+# This is needed on 2008
+- name: install the visual C libraries
+  win_package:
+    path: https://download.microsoft.com/download/1/1/1/1116b75a-9ec3-481a-a3c8-1777b5381140/vcredist_x86.exe
+    product_id: '{FF66E9F6-83E7-3A3E-AF14-8DE9A809A6A4}'
+    arguments: '/qb!'
+  when: "'Windows Server 2008' in ansible_distribution"
+
 - name: stop windows update service
   win_service:
     name: wuauserv
@@ -50,6 +58,14 @@
   args:
     executable: cmd
   when: download_bleachbit is success
+  ignore_errors: yes
+
+# This is needed on 2008, cleaning up..
+- name: uninstall visual c library
+  win_package:
+    product_id: '{FF66E9F6-83E7-3A3E-AF14-8DE9A809A6A4}'
+    state: absent
+  when: "'Windows Server 2008' in ansible_distribution"
 
 - name: create temp directory
   win_file:

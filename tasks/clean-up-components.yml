@@ -2,4 +2,10 @@
 
 - name: clean up components and update files
   win_shell: Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase
+  when: "'Windows Server 2008' not in ansible_distribution"
+  ignore_errors: yes
+
+- name: clean up components and update files
+  win_shell: Dism.exe /online /Cleanup-Image /SpSuperseded
+  when: "'Windows Server 2008' in ansible_distribution"
   ignore_errors: yes
