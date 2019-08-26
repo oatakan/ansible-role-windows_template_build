@@ -131,6 +131,7 @@
   args:
     executable: cmd
   when: download_bleachbit is success
+  ignore_errors: yes
 
 - name: remove bleachbit files
   win_file:
