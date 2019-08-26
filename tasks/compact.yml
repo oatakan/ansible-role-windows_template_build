@@ -60,13 +60,6 @@
   when: download_bleachbit is success
   ignore_errors: yes
 
-# This is needed on 2008, cleaning up..
-- name: uninstall visual c library
-  win_package:
-    product_id: '{FF66E9F6-83E7-3A3E-AF14-8DE9A809A6A4}'
-    state: absent
-  when: "'Windows Server 2008' in ansible_distribution"
-
 - name: create temp directory
   win_file:
     path: '{{ temp_directory }}\win_build'
@@ -144,3 +137,10 @@
     path: '{{ ansible_user_dir }}\BleachBit-Portable'
     state: absent
   when: download_bleachbit is success
+
+# This is needed on 2008, cleaning up..
+- name: uninstall visual c library
+  win_package:
+    product_id: '{FF66E9F6-83E7-3A3E-AF14-8DE9A809A6A4}'
+    state: absent
+  when: "'Windows Server 2008' in ansible_distribution"
