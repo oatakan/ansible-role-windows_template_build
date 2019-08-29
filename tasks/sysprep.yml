@@ -15,16 +15,6 @@
     path: c:\Windows\Panther
     state: directory
 
-- name: remove windows update settings
-  win_regedit:
-    path: HKLM:\Software\Microsoft\Windows\CurrentVersion\WindowsUpdate
-    name: "{{ item }}"
-    state: absent
-  loop:
-    - SusClientId
-    - PingID
-    - AccountDomainSid
-
 - name: enable winrm
   win_shell: '& $([scriptblock]::Create((New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"))) -ForceNewSSLCert -EnableCredSSP'
   ignore_errors: yes

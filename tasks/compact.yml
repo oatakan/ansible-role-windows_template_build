@@ -41,11 +41,21 @@
     state: absent
   ignore_errors: yes
 
-- name: start windows update service
-  win_service:
-    name: wuauserv
-    state: started
-  ignore_errors: yes
+- name: remove windows update settings
+  win_regedit:
+    path: HKLM:\Software\Microsoft\Windows\CurrentVersion\WindowsUpdate
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - SusClientId
+    - PingID
+    - AccountDomainSid
+
+#- name: start windows update service
+#  win_service:
+#    name: wuauserv
+#    state: started
+#  ignore_errors: yes
 
 - name: create update directory
   win_file:
