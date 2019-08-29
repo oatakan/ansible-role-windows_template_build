@@ -10,6 +10,16 @@
 #    data: C:\Windows\system32\sysprep\unattend.xml
 #    type: string
 
+- name: ensure Panther directory exists
+  win_file:
+    path: c:\Windows\Panther
+    state: directory
+
+- name: enable winrm
+  win_shell: '& $([scriptblock]::Create((New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"))) -ForceNewSSLCert -EnableCredSSP'
+  ignore_errors: yes
+  when: "'Windows Server 2008' in ansible_distribution"
+
 - name: copy unattend.xml
   win_template:
     src: unattend.xml.j2
@@ -38,6 +48,7 @@
       arguments: /generalize /oobe /quiet /shutdown
   when:
     - ('VMware' not in ansible_product_name) or ('VMware' in ansible_product_name and target_vagrant | bool) or (target_ovirt | bool)
+    - "'Windows Server 2008' not in ansible_distribution"
 
 - name: create scheduled task to delete WinRM listeners and shutdown
   win_scheduled_task:
@@ -49,11 +60,12 @@
     - path: powershell.exe
       arguments: Remove-Item -Path WSMan:\localhost\Listener\* -Recurse -Force
     - path: shutdown.exe
-      arguments: /s /t 10 /f /d p:4:1 /c "Packer Shutdown"
+      arguments: /s /t 10 /f /d p:4:1 /c "Ansible Shutdown"
   when:
     - "'VMware' in ansible_product_name"
     - not target_vagrant | bool
     - not target_ovirt | bool
+    - "'Windows Server 2008' not in ansible_distribution"
 
 - name: set flag to recreate pagefile after next sysprep
   win_shell: |
