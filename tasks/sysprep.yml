@@ -15,6 +15,16 @@
     path: c:\Windows\Panther
     state: directory
 
+- name: remove windows update settings
+  win_regedit:
+    path: HKLM:\Software\Microsoft\Windows\CurrentVersion\WindowsUpdate
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - SusClientId
+    - PingID
+    - AccountDomainSid
+
 - name: enable winrm
   win_shell: '& $([scriptblock]::Create((New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"))) -ForceNewSSLCert -EnableCredSSP'
   ignore_errors: yes
@@ -48,7 +58,6 @@
       arguments: /generalize /oobe /quiet /shutdown
   when:
     - ('VMware' not in ansible_product_name) or ('VMware' in ansible_product_name and target_vagrant | bool) or (target_ovirt | bool)
-    - "'Windows Server 2008' not in ansible_distribution"
 
 - name: create scheduled task to delete WinRM listeners and shutdown
   win_scheduled_task:
@@ -65,7 +74,6 @@
     - "'VMware' in ansible_product_name"
     - not target_vagrant | bool
     - not target_ovirt | bool
-    - "'Windows Server 2008' not in ansible_distribution"
 
 - name: set flag to recreate pagefile after next sysprep
   win_shell: |
