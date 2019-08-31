@@ -51,16 +51,20 @@
     - PingID
     - AccountDomainSid
 
-#- name: start windows update service
-#  win_service:
-#    name: wuauserv
-#    state: started
-#  ignore_errors: yes
+- name: start windows update service
+  win_service:
+    name: wuauserv
+    state: started
+  ignore_errors: yes
 
 - name: create update directory
   win_file:
     path: C:\Windows\SoftwareDistribution\Download
     state: directory
+  ignore_errors: yes
+
+- name: reset windows update
+  win_shell: wuauclt /resetauthorization /detectnow
   ignore_errors: yes
 
 - name: clean with bleachbit
