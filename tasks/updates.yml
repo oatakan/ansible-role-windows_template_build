@@ -35,7 +35,7 @@
     - "'Windows Server 2008' in ansible_distribution"
 
 - name: get used space after update
-  win_shell: Get-PSDrive C | Select-Object Free | ConvertTo-Json
+  win_shell: Get-PSDrive C | Select-Object Used | ConvertTo-Json
   register: used_space_after_update
   ignore_errors: yes
 
