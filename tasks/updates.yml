@@ -8,6 +8,11 @@
   win_shell: netsh advfirewall set  allprofiles state off
   when: "'Windows Server 2008' in ansible_distribution"
 
+- name: get used space before update
+  win_shell: Get-PSDrive C | Select-Object Used | ConvertTo-Json
+  register: used_space_before_update
+  ignore_errors: yes
+
 - name: update Windows Update Agent on 2008
   win_package:
     path: http://download.windowsupdate.com/windowsupdate/redist/standalone/7.6.7600.320/windowsupdateagent-7.6-x64.exe
@@ -28,6 +33,19 @@
   when:
     - install_updates | bool
     - "'Windows Server 2008' in ansible_distribution"
+
+- name: get used space after update
+  win_shell: Get-PSDrive C | Select-Object Free | ConvertTo-Json
+  register: used_space_after_update
+  ignore_errors: yes
+
+- debug:
+    msg:
+      - "Used space before update: {{ ((used_space_before_update.stdout | from_json)['Used']|int / (1024*1024*1024)) | round(2, 'floor') }} GB"
+      - "Used space after update: {{ ((used_space_after_update.stdout | from_json)['Used']|int / (1024*1024*1024)) | round(2, 'floor') }} GB"
+  when:
+    - used_space_before_update.stdout is defined
+    - used_space_after_update.stdout is defined
 
 - name: enabled firewall for Domain, Public and Private profiles
   win_shell: Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
