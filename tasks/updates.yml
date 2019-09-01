@@ -17,6 +17,7 @@
       - /wuforce
     creates_path: C:\Windows\System32\wuaueng.dll
     creates_version: 7.6.7600.320
+  when: "'Windows Server 2008' in ansible_distribution"
 
 - include_tasks: updates-all.yml
   when:

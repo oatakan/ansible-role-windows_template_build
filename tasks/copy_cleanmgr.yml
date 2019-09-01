@@ -1,0 +1,29 @@
+---
+
+- name: check winsxs cleanmgr file
+  win_stat:
+    path: "{{ winsxs_cleanmgr_file[os_short_name] }}"
+  register: check_winsxs_cleanmgr_file
+
+- name: check winsxs cleanmgr mui file
+  win_stat:
+    path: "{{ winsxs_cleanmgr_mui_file[os_short_name] }}"
+  register: check_winsxs_cleanmgr_mui_file
+
+- name: copy cleanmgr file from winsxs folder
+  win_copy:
+    src: "{{ winsxs_cleanmgr_file[os_short_name] }}"
+    dest: '{{ ansible_env.windir }}\System32\cleanmgr.exe'
+    remote_src: yes
+  when:
+    - check_winsxs_cleanmgr_file.stat.exists
+    - check_winsxs_cleanmgr_mui_file.stat.exists
+
+- name: copy cleanmgr mui file from winsxs folder
+  win_copy:
+    src: "{{ winsxs_cleanmgr_mui_file[os_short_name] }}"
+    dest: '{{ ansible_env.windir }}\System32\en-US\cleanmgr.exe.mui'
+    remote_src: yes
+  when:
+    - check_winsxs_cleanmgr_file.stat.exists
+    - check_winsxs_cleanmgr_mui_file.stat.exists
