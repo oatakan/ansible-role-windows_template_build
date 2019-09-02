@@ -59,6 +59,11 @@
       property: DisabledByDefault
       value: 0
 
+- name: ensure Windows ADK with DISM is removed
+  win_chocolatey:
+    name: windows-adk-deploy
+    state: absent
+
 - name: reboot if TLS config was applied
   win_reboot:
   when: enable_tls12 is changed
