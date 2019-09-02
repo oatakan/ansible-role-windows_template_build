@@ -29,7 +29,30 @@
     - install_updates | bool
     - "'Windows Server 2008' not in ansible_distribution"
 
-- include_tasks: updates-powershell.yml
+#- include_tasks: updates-powershell.yml
+#  when:
+#    - install_updates | bool
+#    - "'Windows Server 2008' in ansible_distribution"
+
+- include_tasks: updates-win2008r2.yml
+  vars:
+    win_update_category_names:
+      - CriticalUpdates
+      - DefinitionUpdates
+      - SecurityUpdates
+      - UpdateRollups
+      - Updates
+    win_update_blacklist:
+      - KB4512506
+      - KB4512514
+    hotfix_download_location: "{{ ansible_env.TEMP }}"
+    hotfixes_group_1:
+     - kb: KB3020369
+       file: Windows6.1-KB3020369-x64.msu
+       url: https://download.microsoft.com/download/F/D/3/FD3728D5-0D2F-44A6-B7DA-1215CC0C9B75/Windows6.1-KB3020369-x64.msu
+     - kb: KB3125574
+       file: windows6.1-kb3125574-v4-x64_2dafb1d203c8964239af3048b5dd4b1264cd93b9.msu
+       url: http://download.windowsupdate.com/d/msdownload/update/software/updt/2016/05/windows6.1-kb3125574-v4-x64_2dafb1d203c8964239af3048b5dd4b1264cd93b9.msu
   when:
     - install_updates | bool
     - "'Windows Server 2008' in ansible_distribution"

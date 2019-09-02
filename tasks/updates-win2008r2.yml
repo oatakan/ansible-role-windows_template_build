@@ -1,0 +1,137 @@
+---
+
+- name: ensure Windows ADK with DISM is installed
+  win_chocolatey:
+    name: windows-adk-deploy
+    state: present
+    version: 10.0.17134.0
+  register: install_windows_adk_deploy
+
+- name: ensure PATH contains Windows ADK
+  win_path:
+    scope: machine
+    state: present
+    elements: "C:\\Program Files (x86)\\Windows Kits\\10\\Assessment and Deployment Kit\\Deployment Tools\\amd64\\DISM"
+
+- name: download hotfix group 1
+  win_get_url:
+    url: '{{ item.url }}'
+    dest: '{{ hotfix_download_location }}\{{ item.file }}'
+  loop: "{{ hotfixes_group_1 }}"
+
+- name: install hotfix group 1
+  win_hotfix:
+    source: '{{ hotfix_download_location }}\{{ item.file }}'
+    state: present
+  register: hotfix_install_group_1
+  loop: "{{ hotfixes_group_1 }}"
+
+- name: debug hotfix installation result
+  debug:
+    var: hotfix_install_group_1
+
+- name: ensure hotfix file is removed (group 1)
+  win_file:
+    path: '{{ hotfix_download_location }}\{{ item.file }}'
+    state: absent
+  loop: "{{ hotfixes_group_1 }}"
+
+- name: reboot from starting update
+  win_reboot:
+
+- block:
+    - name: check for available updates
+      win_updates:
+        category_names: "{{ win_update_category_names }}"
+        state: searched
+      register: available_updates
+
+    - debug:
+        msg: |
+          {{ inventory_hostname }} has {{ available_updates.found_update_count }} updates available.
+          {% for key, value in available_updates.updates.items() %}
+            - {{ value.title }}
+          {% endfor %}
+      when: available_updates.updates is defined
+
+    - debug:
+        var: available_updates
+
+    - name: install all windows updates
+      win_updates:
+        category_names: "{{ win_update_category_names }}"
+        blacklist: "{{ win_update_blacklist | default(omit) }}"
+        whitelist: "{{ win_update_whitelist | default(omit) }}"
+        reboot: yes
+      register: installed_updates
+      when: available_updates.found_update_count|int >= 1
+
+  rescue:
+
+    - name: reboot before continue to retry
+      win_reboot:
+
+    - name: install all windows updates (retry)
+      win_updates:
+        category_names: "{{ win_update_category_names }}"
+        blacklist: "{{ win_update_blacklist | default(omit) }}"
+        whitelist: "{{ win_update_whitelist | default(omit) }}"
+        reboot: yes
+      register: installed_updates_retry
+
+  always:
+
+    - name: check for missing updates.
+      win_updates:
+        state: searched
+      register: available_updates
+
+    - name: list missing updates
+      debug:
+        var: available_updates
+
+    - name: report on installed updates
+      debug:
+        msg: |
+          Host {{ inventory_hostname }} has been patched and rebooted. {{ installed_updates.installed_update_count | default('0') }} updates were installed. The updates installed were:
+
+          {% for key, value in installed_updates.updates.items() %}
+            - {{ value.title }}
+          {% endfor %}
+          {{ installed_updates.failed_update_count | default('0') }} updates failed to install."
+      when: installed_updates.updates is defined
+
+- name: reboot before continuing with skipped updates
+  win_reboot:
+
+- name: install all remaining updates
+  win_updates:
+    category_names: "{{ win_update_category_names }}"
+    whitelist: "{{ win_update_blacklist | default(omit) }}"
+    reboot: yes
+  register: installed_skipped_updates
+
+- name: check for missing updates.
+  win_updates:
+    state: searched
+  register: available_updates
+
+- name: list missing updates
+  debug:
+    var: available_updates
+
+- name: report on installed skipped updates
+  debug:
+    msg: |
+      Host {{ inventory_hostname }} has been patched and rebooted. {{ installed_skipped_updates.installed_update_count | default('0') }} skipped updates were installed. The updates installed were:
+
+      {% for key, value in installed_skipped_updates.updates.items() %}
+        - {{ value.title }}
+      {% endfor %}
+      {{ installed_skipped_updates.failed_update_count | default('0') }} updates failed to install."
+  when: installed_skipped_updates.updates is defined
+
+- name: make sure Windows ADK with DISM for Server 2008 R2 is not installed
+  win_chocolatey:
+    name: windows-adk-deploy
+    state: absent
