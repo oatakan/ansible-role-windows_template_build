@@ -79,7 +79,7 @@
       - 89006A2E.AutodeskSketchBook
       - D5EA27B7.Duolingo-LearnLanguagesforFree
       - 46928bounde.EclipseManager
-      - ActiproSoftwareLLC.562882FEEB491- 
+      - ActiproSoftwareLLC.562882FEEB491-
   register: cleanup_win10_remove
   until: cleanup_win10_remove is successful
   retries: 3

@@ -79,7 +79,9 @@
 
         - name: still more updates - need to retry
           fail:
-            msg: '{{ inventory_hostname }} has {{ missing_updates.found_update_count }} updates still missing. {{ (update_retry_limit | int) - (update_retry_count | int) }} more retries left'
+            msg: >
+              '{{ inventory_hostname }} has {{ missing_updates.found_update_count }} updates still missing.
+              {{ (update_retry_limit | int) - (update_retry_count | int) }} more retries left'
           when: ((update_retry_limit | int) - (update_retry_count | int) > 0)
       when: missing_updates.found_update_count > 0
 

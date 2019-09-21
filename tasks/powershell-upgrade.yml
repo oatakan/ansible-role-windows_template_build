@@ -2,27 +2,40 @@
 
 - name: download script
   raw: '(New-Object -TypeName System.Net.WebClient).DownloadFile("{{ powershell_script_url }}", "{{ powershell_upgrade_script_file }}")'
+  changed_when: False
+  check_mode: no
   register: download_script
 
 - name: set execution policy
   raw: 'Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force'
+  changed_when: False
+  check_mode: no
   ignore_errors: yes
 
 - name: delete scheduled task if it exists
   raw: 'SCHTASKS /Delete /TN upgrade'
   args:
     executable: cmd.exe
+  changed_when: False
+  check_mode: no
   ignore_errors: yes
 
 - name: create a scheduled task to run powershell script
-  raw: SCHTASKS /Create /SC MONTHLY /MO first /D SUN /TN upgrade /TR "powershell.exe -Command '& {{ powershell_upgrade_script_file }} -Version {{ powershell_target_version }} -Username {{ ansible_user }} -Password {{ ansible_password }}'"
+  raw: >
+    SCHTASKS /Create /SC MONTHLY /MO first /D SUN /TN upgrade /TR "powershell.exe -Command
+    '& {{ powershell_upgrade_script_file }} -Version {{ powershell_target_version }}
+    -Username {{ ansible_user }} -Password {{ ansible_password }}'"
   args:
     executable: cmd.exe
+  changed_when: False
+  check_mode: no
 
 - name: run scheduled task
   raw: 'SCHTASKS /Run /TN upgrade'
   args:
     executable: cmd.exe
+  changed_when: False
+  check_mode: no
 
 - name: wait for system to reboot after upgrade
   wait_for_connection:
