@@ -106,6 +106,13 @@
 - name: reboot before continuing with skipped updates
   win_reboot:
 
+- name: install all security updates
+  win_updates:
+    category_names:
+      - SecurityUpdates
+    reboot: yes
+  register: installed_security_updates
+
 - name: install all remaining updates
   win_updates:
     category_names: "{{ win_update_category_names }}"
