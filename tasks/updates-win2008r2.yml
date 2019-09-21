@@ -71,13 +71,38 @@
     - name: reboot before continue to retry
       win_reboot:
 
-    - name: install all windows updates (retry)
-      win_updates:
-        category_names: "{{ win_update_category_names }}"
-        blacklist: "{{ win_update_blacklist | default(omit) }}"
-        whitelist: "{{ win_update_whitelist | default(omit) }}"
-        reboot: yes
-      register: installed_updates_retry
+    - block:
+        - name: install all windows updates (retry)
+          win_updates:
+            category_names: "{{ win_update_category_names }}"
+            blacklist: "{{ win_update_blacklist | default(omit) }}"
+            whitelist: "{{ win_update_whitelist | default(omit) }}"
+            reboot: yes
+          register: installed_updates_retry
+
+      rescue:
+        - name: set failed KB to skip
+          set_fact:
+            failed_kb: "{{ installed_updates_retry.msg | regex_replace('^.*\\((KB.*)\\).*','\\1') }}"
+
+        - name: temporarily skip any failed KB
+          win_updates:
+            category_names: "{{ win_update_category_names }}"
+            blacklist: "{{ failed_kb | default(omit) }}"
+            reboot: yes
+          register: installed_updates_retry_2
+
+        - name: work on skipped KB
+          win_updates:
+            category_names: "{{ win_update_category_names }}"
+            whitelist: "{{ failed_kb | default(omit) }}"
+            reboot: yes
+          register: installed_updates_retry_2
+      when:
+        - installed_updates_retry.msg is defined
+        - ('Failed' in installed_updates_retry.msg)
+        - ('KB' in installed_updates_retry.msg)
+
 
   always:
 
@@ -105,13 +130,6 @@
 
 - name: reboot before continuing with skipped updates
   win_reboot:
-
-- name: install all security updates
-  win_updates:
-    category_names:
-      - SecurityUpdates
-    reboot: yes
-  register: installed_security_updates
 
 - name: install all remaining updates
   win_updates:
