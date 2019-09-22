@@ -39,7 +39,25 @@
 - name: reboot from starting update
   win_reboot:
 
+- name: check for available updates
+  win_updates:
+    category_names: "{{ win_update_category_names }}"
+    blacklist: "{{ win_update_blacklist | default(omit) }}"
+    state: searched
+  register: available_updates
+
+- debug:
+    msg: |
+      {{ inventory_hostname }} has {{ available_updates.found_update_count }} updates available.
+      {% for key, value in available_updates.updates.items() %}
+        - {{ value.title }}
+      {% endfor %}
+  when: available_updates.updates is defined
+
 - include_tasks: updates-with-retry.yml
+  when:
+    - available_updates.updates is defined
+    - available_updates.found_update_count > 0
 
 - name: install all remaining updates
   win_updates:

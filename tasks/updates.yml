@@ -42,17 +42,20 @@
       - SecurityUpdates
       - UpdateRollups
       - Updates
-    win_update_blacklist:
-      - KB4512506
-      - KB4512514
     hotfix_download_location: "{{ ansible_env.TEMP }}"
     hotfixes_group_1:
-     - kb: KB3020369
-       file: Windows6.1-KB3020369-x64.msu
-       url: https://download.microsoft.com/download/F/D/3/FD3728D5-0D2F-44A6-B7DA-1215CC0C9B75/Windows6.1-KB3020369-x64.msu
-     - kb: KB3125574
-       file: windows6.1-kb3125574-v4-x64_2dafb1d203c8964239af3048b5dd4b1264cd93b9.msu
-       url: http://download.windowsupdate.com/d/msdownload/update/software/updt/2016/05/windows6.1-kb3125574-v4-x64_2dafb1d203c8964239af3048b5dd4b1264cd93b9.msu
+      - kb: KB3020369
+        file: Windows6.1-KB3020369-x64.msu
+        url: https://download.microsoft.com/download/F/D/3/FD3728D5-0D2F-44A6-B7DA-1215CC0C9B75/Windows6.1-KB3020369-x64.msu
+      - kb: KB3125574
+        file: windows6.1-kb3125574-v4-x64_2dafb1d203c8964239af3048b5dd4b1264cd93b9.msu
+        url: http://download.windowsupdate.com/d/msdownload/update/software/updt/2016/05/windows6.1-kb3125574-v4-x64_2dafb1d203c8964239af3048b5dd4b1264cd93b9.msu
+      - kb: KB4474419
+        file: windows6.1-kb4474419-v3-x64_b5614c6cea5cb4e198717789633dca16308ef79c.msu
+        url: http://download.windowsupdate.com/c/msdownload/update/software/secu/2019/09/windows6.1-kb4474419-v3-x64_b5614c6cea5cb4e198717789633dca16308ef79c.msu
+      - kb: KB4490628
+        file: windows6.1-kb4490628-x64_d3de52d6987f7c8bdc2c015dca69eac96047c76e.msu
+        url: http://download.windowsupdate.com/c/msdownload/update/software/secu/2019/03/windows6.1-kb4490628-x64_d3de52d6987f7c8bdc2c015dca69eac96047c76e.msu
   when:
     - install_updates | bool
     - "'Windows Server 2008' in ansible_distribution"
