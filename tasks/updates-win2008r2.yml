@@ -59,13 +59,6 @@
     - available_updates.updates is defined
     - available_updates.found_update_count > 0
 
-- name: install all remaining updates
-  win_updates:
-    category_names: "{{ win_update_category_names }}"
-    whitelist: "{{ win_update_blacklist | default(omit) }}"
-    reboot: yes
-  register: installed_skipped_updates
-
 - name: check for missing updates.
   win_updates:
     state: searched
@@ -74,19 +67,6 @@
 - name: list missing updates
   debug:
     var: available_updates
-
-- name: report on installed skipped updates
-  debug:
-    msg: |
-      Host {{ inventory_hostname }} has been patched and rebooted.
-      {{ installed_skipped_updates.installed_update_count | default('0') }} skipped updates were installed.
-      The updates installed were:
-
-      {% for key, value in installed_skipped_updates.updates.items() %}
-        - {{ value.title }}
-      {% endfor %}
-      {{ installed_skipped_updates.failed_update_count | default('0') }} updates failed to install."
-  when: installed_skipped_updates.updates is defined
 
 - name: make sure Windows ADK with DISM for Server 2008 R2 is not installed
   win_chocolatey:

@@ -77,7 +77,7 @@
         update_retry_count: '{{ update_retry_count | default(0) | int + 1 }}'
 
     - debug:
-        msg: "Still more updates remaining - retrying... ({{ update_retry_count }}/{{ update_retry_limit }} )"
+        msg: "Still more updates remaining - retrying... ({{ update_retry_count }}/{{ update_retry_limit }})"
 
     - include_tasks: updates-with-retry.yml
       when: ((update_retry_limit | int) - (update_retry_count | int) >= 0)
