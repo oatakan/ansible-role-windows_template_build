@@ -59,3 +59,6 @@
 - include_tasks: sysprep.yml
 
 - include_tasks: compact.yml
+
+- include_tasks: shutdown.yml
+  when: shutdown_instance | bool

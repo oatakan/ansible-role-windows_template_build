@@ -1,0 +1,5 @@
+---
+
+- name: run sysprep-shutdown scheduled task
+  win_shell: schtasks.exe /Run /TN "sysprep-shutdown"
+  ignore_errors: yes

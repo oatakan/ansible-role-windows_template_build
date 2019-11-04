@@ -41,6 +41,8 @@ local_administrator_password: Chang3MyP@ssw0rd21
 local_account_username: ansible
 local_account_password: Chang3MyP@ssw0rd21
 
+shutdown_instance: yes
+
 winsxs_cleanmgr_file:
   2008r2: '{{ ansible_env.windir }}\winsxs\amd64_microsoft-windows-cleanmgr_31bf3856ad364e35_6.1.7600.16385_none_c9392808773cd7da\cleanmgr.exe'
   2012: '{{ ansible_env.windir }}\WinSxS\amd64_microsoft-windows-cleanmgr_31bf3856ad364e35_6.2.9200.16384_none_c60dddc5e750072a\cleanmgr.exe'
