@@ -9,6 +9,11 @@
 - include_tasks: enable-tlsv12.yml
   when: upgrade_powershell | bool
 
+- include_tasks: disable-auto-logon.yml
+
+- include_tasks: updates.yml
+  when: install_updates | bool
+
 - include_role:
     name: "{{ ovirt_guest_agent_role }}"
   when: target_ovirt | bool
@@ -16,11 +21,6 @@
 - include_role:
     name: "{{ virtualbox_guest_additions_role }}"
   when: "'VirtualBox' in ansible_product_name"
-
-- include_tasks: disable-auto-logon.yml
-
-- include_tasks: updates.yml
-  when: install_updates | bool
 
 - include_role:
     name: "{{ vmware_tools_role }}"
