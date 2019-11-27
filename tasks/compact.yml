@@ -77,7 +77,9 @@
     windows_explorer.search_history windows_explorer.thumbnails > NUL'
   args:
     executable: cmd
-  when: download_bleachbit is success
+  when:
+    - bleachbit_clean|bool
+    - download_bleachbit is success
   ignore_errors: yes
 
 - name: create temp directory
@@ -150,7 +152,9 @@
   win_shell: '{{ ansible_user_dir }}\BleachBit-Portable\bleachbit_console.exe --clean system.free_disk_space'
   args:
     executable: cmd
-  when: download_bleachbit is success
+  when:
+    - bleachbit_free_disk_space|bool
+    - download_bleachbit is success
   ignore_errors: yes
 
 - name: remove bleachbit files

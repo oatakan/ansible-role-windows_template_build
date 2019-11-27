@@ -29,6 +29,9 @@ target_ovirt: no
 target_ec2: no
 target_vagrant: no
 
+bleachbit_clean: yes
+bleachbit_free_disk_space: yes
+
 ec2_ena_driver_role: oatakan.windows_ec2_ena_driver
 ovirt_guest_agent_role: oatakan.windows_ovirt_guest_agent
 vmware_tools_role: oatakan.windows_vmware_tools
