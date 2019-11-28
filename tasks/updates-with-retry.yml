@@ -40,6 +40,7 @@
     - name: work on any skipped KB
       win_updates:
         category_names: "{{ win_update_category_names }}"
+        blacklist: "{{ win_update_blacklist | default(omit) }}"
         whitelist: "{{ failed_kb | default([]) }}"
         reboot: yes
       register: installed_updates_retry_skipped
@@ -50,7 +51,7 @@
     - name: check for missing updates
       win_updates:
         category_names: "{{ win_update_category_names }}"
-        whitelist: "{{ win_update_blacklist | default(omit) }}"
+        blacklist: "{{ win_update_blacklist | default(omit) }}"
         state: searched
       register: missing_updates
 
