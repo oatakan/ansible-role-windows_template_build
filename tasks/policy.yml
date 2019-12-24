@@ -13,3 +13,8 @@
   win_shell: Set-NetConnectionProfile -NetworkCategory Private
   when:
     - "'Windows 10' in ansible_distribution"
+
+- name: Ensure local account password doesn't expire
+  win_user:
+    name: "{{ ansible_user }}"
+    password_never_expires: yes
