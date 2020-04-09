@@ -26,6 +26,7 @@ ultradefrag_download_url: https://astuteinternet.dl.sourceforge.net/project/ultr
 enable_auto_logon: yes
 
 target_ovirt: no
+target_qemu: no
 target_ec2: no
 target_vagrant: no
 
@@ -34,6 +35,7 @@ bleachbit_free_disk_space: yes
 
 ec2_ena_driver_role: oatakan.windows_ec2_ena_driver
 ovirt_guest_agent_role: oatakan.windows_ovirt_guest_agent
+virtio_role: oatakan.windows_virtio
 vmware_tools_role: oatakan.windows_vmware_tools
 virtualbox_guest_additions_role: oatakan.windows_virtualbox_guest_additions
 

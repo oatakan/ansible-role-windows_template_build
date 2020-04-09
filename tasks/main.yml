@@ -16,7 +16,11 @@
 
 - include_role:
     name: "{{ ovirt_guest_agent_role }}"
-  when: target_ovirt | bool
+  when: target_ovirt | bool and not target_qemu | bool
+
+- include_role:
+    name: "{{ virtio_role }}"
+  when: target_qemu | bool or ('KubeVirt' in ansible_system_vendor | default(''))
 
 - include_role:
     name: "{{ virtualbox_guest_additions_role }}"
