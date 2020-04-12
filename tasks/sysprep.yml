@@ -27,6 +27,7 @@
   when:
     - ('VMware' not in ansible_product_name) or ('VMware' in ansible_product_name and target_vagrant | bool)
     - not target_ovirt | bool
+    - not ('KubeVirt' in ansible_system_vendor | default(''))
 
 #- name: run sysprep
 #  win_shell: C:\Windows\system32\sysprep\sysprep.exe /generalize /shutdown /oobe /quiet
@@ -47,7 +48,7 @@
     - path: C:\windows\system32\sysprep\sysprep.exe
       arguments: /generalize /oobe /quiet /shutdown
   when:
-    - ('VMware' not in ansible_product_name) or ('VMware' in ansible_product_name and target_vagrant | bool) or (target_ovirt | bool)
+    - ('VMware' not in ansible_product_name) or ('VMware' in ansible_product_name and target_vagrant | bool) or (target_ovirt | bool) or ('KubeVirt' in ansible_system_vendor | default(''))
 
 - name: create scheduled task to delete WinRM listeners and shutdown
   win_scheduled_task:
@@ -64,6 +65,7 @@
     - "'VMware' in ansible_product_name"
     - not target_vagrant | bool
     - not target_ovirt | bool
+    - not ('KubeVirt' in ansible_system_vendor | default(''))
 
 - name: set flag to recreate pagefile after next sysprep
   win_shell: |
