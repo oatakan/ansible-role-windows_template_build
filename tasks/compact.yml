@@ -91,6 +91,7 @@
   win_get_url:
     url: '{{ ultradefrag_download_url }}'
     dest: '{{ temp_directory }}\win_build\ultradefrag.zip'
+    follow_redirects: all
   register: download_ultradefrag
   until: download_ultradefrag is success
   delay: 3
