@@ -4,7 +4,7 @@ install_updates: yes
 remove_apps: no
 clean_up_components: yes
 upgrade_powershell: no
-powershell_target_version: 4.0
+powershell_target_version: 5.1
 temp_directory: "{{ ansible_env.TEMP }}"
 update_retry_limit: 10
 
