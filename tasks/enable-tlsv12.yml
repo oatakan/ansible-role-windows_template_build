@@ -63,6 +63,10 @@
   win_chocolatey:
     name: windows-adk-deploy
     state: absent
+  register: remove_win_adk_dism
+  until: remove_win_adk_dism is success
+  delay: 3
+  retries: 5
 
 - name: reboot if TLS config was applied
   win_reboot:
