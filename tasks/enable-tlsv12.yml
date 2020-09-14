@@ -70,5 +70,5 @@
 
 - name: reboot if TLS config was applied
   win_reboot:
-    post_reboot_delay: 60
+    post_reboot_delay: 120
   when: enable_tls12 is changed
