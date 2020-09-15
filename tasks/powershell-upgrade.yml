@@ -41,9 +41,12 @@
   pause:
     seconds: 300
 
+- debug:
+    msg: "{{ powershell_target_version }}"
+
 # apply winrm memory hotfix for powershell 3.0
 - include_tasks: winrm-memfix.yml
-  when: powershell_target_version == '3.0'
+  when: powershell_target_version is version('3.0', '==')
 
 - name: wait for system to reboot after upgrade
   wait_for_connection:
