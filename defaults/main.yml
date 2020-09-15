@@ -11,6 +11,9 @@ update_retry_limit: 10
 powershell_script_url: https://raw.githubusercontent.com/oatakan/ansible-role-windows-template-build/master/files/Upgrade-PowerShell.ps1
 powershell_upgrade_script_file: 'C:\Upgrade-PowerShell.ps1'
 
+ps_memfix_script_url: https://raw.githubusercontent.com/oatakan/ansible-role-windows-template-build/master/files/Install-WMF3Hotfix.ps1
+ps_memfix_script_file: 'C:\Install-WMF3Hotfix.ps1'
+
 enable_tlsv12_hotfix_download_location: "{{ ansible_env.TEMP }}"
 enable_tlsv12_hotfix:
   kb: KB3080079

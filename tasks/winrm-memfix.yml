@@ -1,7 +1,9 @@
 ---
 
+# see https://docs.ansible.com/ansible/latest/user_guide/windows_setup.html#winrm-memory-hotfix
+
 - name: download script
-  raw: '(New-Object -TypeName System.Net.WebClient).DownloadFile("{{ powershell_script_url }}", "{{ powershell_upgrade_script_file }}")'
+  raw: '(New-Object -TypeName System.Net.WebClient).DownloadFile("{{ ps_memfix_script_url }}", "{{ ps_memfix_script_file }}")'
   changed_when: False
   check_mode: no
   register: download_script
@@ -13,7 +15,7 @@
   ignore_errors: yes
 
 - name: delete scheduled task if it exists
-  raw: 'SCHTASKS /Delete /TN upgrade'
+  raw: 'SCHTASKS /Delete /TN memfix'
   args:
     executable: cmd.exe
   changed_when: False
@@ -22,42 +24,37 @@
 
 - name: create a scheduled task to run powershell script
   raw: >
-    SCHTASKS /Create /SC MONTHLY /MO first /D SUN /TN upgrade /TR "powershell.exe -Command
-    '& {{ powershell_upgrade_script_file }} -Version {{ powershell_target_version }}
-    -Username {{ ansible_user }} -Password {{ ansible_password }}'"
+    SCHTASKS /Create /SC MONTHLY /MO first /D SUN /TN memfix /TR "powershell.exe -Command
+    '& {{ ps_memfix_script_file }} -Verbose'"
   args:
     executable: cmd.exe
   changed_when: False
   check_mode: no
 
 - name: run scheduled task
-  raw: 'SCHTASKS /Run /TN upgrade'
+  raw: 'SCHTASKS /Run /TN memfix'
   args:
     executable: cmd.exe
   changed_when: False
   check_mode: no
 
-- name: wait for 300 seconds
+- name: wait for 60 seconds
   pause:
-    seconds: 300
+    seconds: 60
 
-# apply winrm memory hotfix for powershell 3.0
-- include_tasks: winrm-memfix.yml
-  when: powershell_target_version == '3.0'
-
-- name: wait for system to reboot after upgrade
+- name: wait for system to reboot after fix
   wait_for_connection:
     sleep: 30
     timeout: 300
 
 - name: delete scheduled task
   win_scheduled_task:
-    name: upgrade
+    name: memfix
     state: absent
 
 - name: delete script
   win_file:
-    path: "{{ powershell_upgrade_script_file }}"
+    path: "{{ ps_memfix_script_file }}"
     state: absent
 
 - name: ensure auto login is disabled
