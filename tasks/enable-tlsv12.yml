@@ -18,11 +18,17 @@
     url: '{{ enable_tlsv12_hotfix.url }}'
     dest: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }}'
 
-- name: install hotfix
+- name: install hotfix (PS >= 4)
   win_hotfix:
     source: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }}'
     state: present
   register: hotfix_install
+  when: powershell_target_version is version('4.0', '>=')
+
+- name: install hotfix (PS == 3)
+  win_shell: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }} /quiet /norestart'
+  register: hotfix_install
+  when: powershell_target_version is version('3.0', '==')
 
 - name: debug hotfix installation result
   debug:
@@ -35,7 +41,7 @@
 
 - name: reboot if needed
   win_reboot:
-  when: hotfix_install.reboot_required
+  when: hotfix_install.reboot_required | default(False)
 
 - name: enable TLSv1.2 support
   win_regedit:
