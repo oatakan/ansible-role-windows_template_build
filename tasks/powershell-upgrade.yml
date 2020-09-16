@@ -37,9 +37,9 @@
   changed_when: False
   check_mode: no
 
-- name: wait for 300 seconds
+- name: wait for 500 seconds
   pause:
-    seconds: 300
+    seconds: 500
 
 - debug:
     msg: "{{ powershell_target_version }}"
