@@ -13,7 +13,7 @@
     state: present
     elements: "C:\\Program Files (x86)\\Windows Kits\\10\\Assessment and Deployment Kit\\Deployment Tools\\amd64\\DISM"
 
-- name: download hotfix group 1
+- name: download hotfix group 1 (PS >= 4)
   win_get_url:
     url: '{{ item.url }}'
     dest: '{{ hotfix_download_location }}\{{ item.file }}'
@@ -25,6 +25,13 @@
     state: present
   register: hotfix_install_group_1
   loop: "{{ hotfixes_group_1 }}"
+  when: ansible_powershell_version is version('4', '>=')
+
+- name: install hotfix (PS == 3)
+  win_shell: '{{ hotfix_download_location }}\{{ item.file }} /quiet /norestart'
+  register: hotfix_install_group_1
+  loop: "{{ hotfixes_group_1 }}"
+  when: ansible_powershell_version is version('3', '==')
 
 - name: debug hotfix installation result
   debug:
