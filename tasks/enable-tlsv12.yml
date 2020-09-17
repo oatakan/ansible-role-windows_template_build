@@ -23,12 +23,12 @@
     source: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }}'
     state: present
   register: hotfix_install
-  when: powershell_target_version is version('4.0', '>=')
+  when: ansible_powershell_version is version('4', '>=')
 
 - name: install hotfix (PS == 3)
   win_shell: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }} /quiet /norestart'
   register: hotfix_install
-  when: powershell_target_version is version('3.0', '==')
+  when: ansible_powershell_version is version('3', '==')
 
 - name: debug hotfix installation result
   debug:
