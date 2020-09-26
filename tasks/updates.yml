@@ -6,7 +6,7 @@
 
 - name: disable firewall for Domain, Public and Private profiles
   win_shell: netsh advfirewall set  allprofiles state off
-  when: "'Windows Server 2008' in ansible_distribution"
+  when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"
 
 - name: get used space before update
   win_shell: Get-PSDrive C | Select-Object Used | ConvertTo-Json
@@ -22,7 +22,7 @@
       - /wuforce
     creates_path: C:\Windows\System32\wuaueng.dll
     creates_version: 7.6.7600.320
-  when: "'Windows Server 2008' in ansible_distribution"
+  when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"
 
 - include_tasks: updates-all.yml
   vars:
@@ -35,6 +35,7 @@
   when:
     - install_updates | bool
     - "'Windows Server 2008' not in ansible_distribution"
+    - "'Windows 7' not in ansible_distribution"
 
 #- include_tasks: updates-powershell.yml
 #  when:
@@ -65,7 +66,7 @@
         url: http://download.windowsupdate.com/c/msdownload/update/software/secu/2019/03/windows6.1-kb4490628-x64_d3de52d6987f7c8bdc2c015dca69eac96047c76e.msu
   when:
     - install_updates | bool
-    - "'Windows Server 2008' in ansible_distribution"
+    - "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"
 
 - name: get used space after update
   win_shell: Get-PSDrive C | Select-Object Used | ConvertTo-Json
@@ -86,4 +87,4 @@
 
 - name: enable firewall for Domain, Public and Private profiles
   win_shell: netsh advfirewall set  allprofiles state on
-  when: "'Windows Server 2008' in ansible_distribution"
+  when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"

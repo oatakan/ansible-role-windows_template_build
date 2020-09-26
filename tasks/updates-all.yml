@@ -36,8 +36,8 @@
   delay: 10
   retries: 100
   ignore_errors: yes
-  when: "'Windows 10' in ansible_distribution"
+  when: "'Server' not in ansible_distribution"
 
 - name: reboot windows
   win_reboot:
-  when: "'Windows 10' in ansible_distribution"
+  when: "'Server' not in ansible_distribution"

@@ -35,7 +35,7 @@
 - include_tasks: policy.yml
 
 - include_tasks: power.yml
-  when: "'Windows 10' in ansible_distribution"
+  when: "'Server' not in ansible_distribution"
 
 - include_tasks: enable-rdp.yml
 
@@ -50,7 +50,7 @@
 - include_tasks: remove-apps-alt-2.yml
   when:
     - remove_apps | bool
-    - "'Windows 10' in ansible_distribution"
+    - "'Server' not in ansible_distribution"
 
 - include_role:
     name: "{{ ec2_ena_driver_role }}"
