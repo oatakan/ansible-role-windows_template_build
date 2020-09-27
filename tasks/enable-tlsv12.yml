@@ -65,6 +65,17 @@
       property: DisabledByDefault
       value: 0
 
+- name: enable strong crypto
+  win_regedit:
+    path: HKLM:\{{ item }}
+    name: SchUseStrongCrypto
+    data: 1
+    type: dword
+    state: present
+  loop:
+    - 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319'
+    - 'SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v4.0.30319'
+
 - name: ensure Windows ADK with DISM is removed
   win_chocolatey:
     name: windows-adk-deploy
