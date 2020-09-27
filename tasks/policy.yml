@@ -9,10 +9,15 @@
     type: dword
   when: policy.allow_unauthenticated_guest_access|bool
 
-- name: set connection profile to private
+- name: set connection profile to private (Windows 10)
   win_shell: Set-NetConnectionProfile -NetworkCategory Private
   when:
     - "'Windows 10' in ansible_distribution"
+
+- name: set connection profile to private (Windows 7)
+  win_shell: '{{ set_network_to_private }}'
+  when:
+    - "'Windows 7' in ansible_distribution"
 
 - name: Ensure local account password doesn't expire
   win_user:
