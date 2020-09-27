@@ -50,8 +50,8 @@
 
 - name: wait for system to reboot after upgrade
   wait_for_connection:
-    sleep: 30
-    timeout: 300
+    sleep: 60
+    timeout: 400
 
 - name: delete scheduled task
   win_scheduled_task:
