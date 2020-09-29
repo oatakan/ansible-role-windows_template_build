@@ -46,8 +46,8 @@
 - name: wait for system to stop responding
   wait_for:
     host: "{{ ansible_host }}"
-    port: "{{ ansible_port | default(hostvars[inventory_hostname].ansible_port) }}"
-    timeout: 700
+    port: "{{ ansible_port | default('5985') }}"
+    timeout: 600
     state: stopped
   delegate_to: localhost
   failed_when: false
@@ -57,9 +57,10 @@
 - name: wait for system to start responding
   wait_for:
     host: "{{ ansible_host }}"
-    port: "{{ ansible_port | default(hostvars[inventory_hostname].ansible_port) }}"
+    port: "{{ ansible_port | default('5985') }}"
     timeout: 300
   delegate_to: localhost
+  failed_when: false
   vars:
     ansible_connection: local
 
