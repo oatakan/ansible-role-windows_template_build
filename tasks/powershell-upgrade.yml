@@ -1,11 +1,5 @@
 ---
 
-- name: stop windows update service
-  raw: net stop wuauserv
-  args:
-    executable: cmd.exe
-  failed_when: false
-
 - name: download script
   raw: '(New-Object -TypeName System.Net.WebClient).DownloadFile("{{ powershell_script_url }}", "{{ powershell_upgrade_script_file }}")'
   changed_when: False
@@ -36,6 +30,12 @@
   changed_when: False
   check_mode: no
 
+- name: stop windows update service
+  raw: net stop wuauserv
+  args:
+    executable: cmd.exe
+  failed_when: false
+
 - name: run scheduled task
   raw: 'SCHTASKS /Run /TN upgrade'
   args:
@@ -43,26 +43,8 @@
   changed_when: False
   check_mode: no
 
-- name: wait for system to stop responding
-  wait_for:
-    host: "{{ ansible_host }}"
-    port: "{{ ansible_port | default('5985') }}"
-    timeout: 600
-    state: stopped
-  delegate_to: localhost
-  failed_when: false
-  vars:
-    ansible_connection: local
-
-- name: wait for system to start responding
-  wait_for:
-    host: "{{ ansible_host }}"
-    port: "{{ ansible_port | default('5985') }}"
-    timeout: 300
-  delegate_to: localhost
-  failed_when: false
-  vars:
-    ansible_connection: local
+- pause:
+    seconds: 600
 
 - name: wait for powershell upgrade task to finish
   raw: '((schtasks /query /TN upgrade)[4] -split " +")[-2]'
@@ -72,7 +54,7 @@
   failed_when: false
   until: (upgrade_status_check.stdout | trim | lower) == 'ready'
   delay: 10
-  retries: 6
+  retries: 10
 
 - debug:
     msg: "{{ powershell_target_version }}"
