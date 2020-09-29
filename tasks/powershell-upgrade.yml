@@ -1,5 +1,11 @@
 ---
 
+- name: stop windows update service
+  raw: net stop wuauserv
+  args:
+    executable: cmd.exe
+  failed_when: false
+
 - name: download script
   raw: '(New-Object -TypeName System.Net.WebClient).DownloadFile("{{ powershell_script_url }}", "{{ powershell_upgrade_script_file }}")'
   changed_when: False
@@ -37,9 +43,35 @@
   changed_when: False
   check_mode: no
 
-- name: wait for 500 seconds
-  pause:
-    seconds: 500
+- name: wait for system to stop responding
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: "{{ ansible_port }}"
+    timeout: 700
+    state: stopped
+  delegate_to: localhost
+  failed_when: false
+  vars:
+    ansible_connection: local
+
+- name: wait for system to start responding
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: "{{ ansible_port }}"
+    timeout: 300
+  delegate_to: localhost
+  vars:
+    ansible_connection: local
+
+- name: wait for powershell upgrade task to finish
+  raw: '((schtasks /query /TN upgrade)[4] -split " +")[-2]'
+  changed_when: False
+  check_mode: no
+  register: upgrade_status_check
+  failed_when: false
+  until: (upgrade_status_check.stdout | trim | lower) == 'ready'
+  delay: 10
+  retries: 6
 
 - debug:
     msg: "{{ powershell_target_version }}"
