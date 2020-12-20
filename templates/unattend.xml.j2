@@ -41,7 +41,7 @@
                 <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
                 <NetworkLocation>Home</NetworkLocation>
                 <ProtectYourPC>1</ProtectYourPC>
-{% if not '2008' in windows_distro_name or not 'Windows 7' in ansible_distribution %}
+{% if not '2008' in ansible_distribution or not 'Windows 7' in ansible_distribution %}
                 <HideLocalAccountScreen>true</HideLocalAccountScreen>
                 <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
                 <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
