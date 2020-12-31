@@ -44,7 +44,7 @@
   check_mode: no
 
 - pause:
-    seconds: 900
+    seconds: "{{ upgrade_wait_timeout }}"
 
 - name: wait for powershell upgrade task to finish
   raw: '((schtasks /query /TN upgrade)[4] -split " +")[-2]'
