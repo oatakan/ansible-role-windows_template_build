@@ -44,7 +44,7 @@
   check_mode: no
 
 - pause:
-    seconds: 600
+    seconds: 900
 
 - name: wait for powershell upgrade task to finish
   raw: '((schtasks /query /TN upgrade)[4] -split " +")[-2]'
@@ -54,7 +54,7 @@
   failed_when: false
   until: (upgrade_status_check.stdout | trim | lower) == 'ready'
   delay: 10
-  retries: 30
+  retries: 10
 
 - debug:
     msg: "{{ powershell_target_version }}"
