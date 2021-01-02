@@ -54,6 +54,9 @@
   delay: 10
   retries: 10
 
+- pause:
+    seconds: 60
+
 - name: delete scheduled task
   win_scheduled_task:
     name: memfix
