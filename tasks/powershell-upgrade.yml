@@ -30,8 +30,8 @@
   changed_when: False
   check_mode: no
 
-- name: stop windows update service
-  raw: net stop wuauserv
+- name: start windows update service
+  raw: net start wuauserv
   args:
     executable: cmd.exe
   failed_when: false
