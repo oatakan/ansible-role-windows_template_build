@@ -36,6 +36,9 @@
     executable: cmd.exe
   failed_when: false
 
+- pause:
+    seconds: 60
+
 - name: run scheduled task
   raw: 'SCHTASKS /Run /TN upgrade'
   args:
