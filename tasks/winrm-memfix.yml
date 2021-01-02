@@ -44,10 +44,24 @@
     sleep: 30
     timeout: 300
 
+- name: wait for powershell memfix task to finish
+  raw: '((schtasks /query /TN memfix)[4] -split " +")[-2]'
+  changed_when: False
+  check_mode: no
+  register: memfix_status_check
+  failed_when: false
+  until: (memfix_status_check.stdout | trim | lower) == 'ready'
+  delay: 10
+  retries: 10
+
 - name: delete scheduled task
   win_scheduled_task:
     name: memfix
     state: absent
+  register: delete_scheduled_task
+  until: delete_scheduled_task is success
+  delay: 10
+  retries: 10
 
 - name: delete script
   win_file:
