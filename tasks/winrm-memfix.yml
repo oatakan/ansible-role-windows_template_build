@@ -38,6 +38,12 @@
   changed_when: False
   check_mode: no
 
+- name: wait for system to reboot after fix
+  wait_for_connection:
+    delay: 120
+    sleep: 30
+    timeout: 300
+
 - name: wait for powershell memfix task to finish
   raw: '((schtasks /query /TN memfix)[4] -split " +")[-2]'
   changed_when: False
@@ -47,12 +53,6 @@
   until: (memfix_status_check.stdout | trim | lower) == 'ready'
   delay: 10
   retries: 30
-
-- name: wait for system to reboot after fix
-  wait_for_connection:
-    delay: 60
-    sleep: 30
-    timeout: 300
 
 - name: delete scheduled task
   win_scheduled_task:
