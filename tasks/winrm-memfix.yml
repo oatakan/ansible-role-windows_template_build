@@ -40,7 +40,7 @@
 
 - name: wait for system to reboot after fix
   wait_for_connection:
-    delay: 120
+    delay: 240
     sleep: 30
     timeout: 300
 
