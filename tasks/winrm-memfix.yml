@@ -3,7 +3,7 @@
 # see https://docs.ansible.com/ansible/latest/user_guide/windows_setup.html#winrm-memory-hotfix
 
 - name: download script
-  raw: '(New-Object -TypeName System.Net.WebClient).DownloadFile("{{ ps_memfix_script_url }}", "{{ ps_memfix_script_file }}")'
+  raw: '[Net.ServicePointManager]::SecurityProtocol = [Enum]::ToObject([Net.SecurityProtocolType], 3072); (New-Object -TypeName System.Net.WebClient).DownloadFile("{{ ps_memfix_script_url }}", "{{ ps_memfix_script_file }}")'
   changed_when: False
   check_mode: no
   register: download_script
@@ -15,7 +15,7 @@
   ignore_errors: yes
 
 - name: delete scheduled task if it exists
-  raw: 'SCHTASKS /Delete /TN memfix'
+  raw: 'SCHTASKS /Delete /TN memfix /f'
   args:
     executable: cmd.exe
   changed_when: False

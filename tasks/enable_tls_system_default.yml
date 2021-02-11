@@ -1,0 +1,47 @@
+# on Windows 7 SP1, TLS 1.1 and 1.2 is not enabled by default
+# this hotfix is needed to fix that
+# see https://support.microsoft.com/en-us/topic/support-for-tls-system-default-versions-included-in-the-net-framework-3-5-1-on-windows-7-sp1-and-server-2008-r2-sp1-5ef38dda-8e6c-65dc-c395-62d2df58715a
+
+- name: download hotfix
+  raw: '(New-Object -TypeName System.Net.WebClient).DownloadFile("{{ enable_tls_support_hotfix.url }}", "{{ enable_tls_support_hotfix_download_location }}\\{{ enable_tls_support_hotfix.file }}")'
+  changed_when: False
+  check_mode: no
+
+- name: delete scheduled task if it exists (hotfix)
+  raw: 'SCHTASKS /Delete /TN hotfix_install /f'
+  args:
+    executable: cmd.exe
+  changed_when: False
+  check_mode: no
+  ignore_errors: yes
+
+- name: create a scheduled task to install hotfix
+  raw: SCHTASKS /Create /SC MONTHLY /MO first /D SUN /TN hotfix_install /TR "{{ enable_tls_support_hotfix_download_location }}\\{{ enable_tls_support_hotfix.file }} /quiet /norestart"
+  args:
+    executable: cmd.exe
+  changed_when: False
+  check_mode: no
+
+- name: run scheduled task (hotfix)
+  raw: 'SCHTASKS /Run /TN hotfix_install'
+  args:
+    executable: cmd.exe
+  changed_when: False
+  check_mode: no
+
+- pause:
+    seconds: 30
+
+- name: delete scheduled task (hotfix)
+  raw: 'SCHTASKS /Delete /TN hotfix_install /f'
+  args:
+    executable: cmd.exe
+  changed_when: False
+  check_mode: no
+  ignore_errors: yes
+
+- name: remove hotfix file
+  raw: 'Remove-Item -Path {{ enable_tls_support_hotfix_download_location }}\{{ enable_tls_support_hotfix.file }} -Force'
+  changed_when: False
+  check_mode: no
+  ignore_errors: yes

@@ -1,7 +1,9 @@
 ---
 
+- include_tasks: enable_tls_system_default.yml
+
 - name: download script
-  raw: '(New-Object -TypeName System.Net.WebClient).DownloadFile("{{ powershell_script_url }}", "{{ powershell_upgrade_script_file }}")'
+  raw: '[Net.ServicePointManager]::SecurityProtocol = [Enum]::ToObject([Net.SecurityProtocolType], 3072); (New-Object -TypeName System.Net.WebClient).DownloadFile("{{ powershell_script_url }}", "{{ powershell_upgrade_script_file }}")'
   changed_when: False
   check_mode: no
   register: download_script
@@ -13,7 +15,7 @@
   ignore_errors: yes
 
 - name: delete scheduled task if it exists
-  raw: 'SCHTASKS /Delete /TN upgrade'
+  raw: 'SCHTASKS /Delete /TN upgrade /f'
   args:
     executable: cmd.exe
   changed_when: False
