@@ -9,6 +9,9 @@
 - include_tasks: enable-tlsv12.yml
   when: upgrade_powershell | bool
 
+- include_tasks: security-update-win2012.yml
+  when: "'Windows Server 2008' in ansible_distribution or 'Windows 8' in ansible_distribution"
+
 - include_tasks: disable-auto-logon.yml
 
 - include_tasks: updates.yml

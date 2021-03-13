@@ -1,0 +1,32 @@
+---
+# this update is needed to enable .NET clients to use https (tslv12) on Windows 8.1 and Windows Server 2012 R2
+# see https://www.microsoft.com/en-us/download/confirmation.aspx?id=42883
+
+- name: download hotfix
+  win_get_url:
+    url: '{{ dot_net_security_hotfix.url }}'
+    dest: '{{ dot_net_security_hotfix_download_location }}\{{ dot_net_security_hotfix.file }}'
+  register: download_hotfix
+  until: download_hotfix is success
+  delay: 3
+  retries: 5
+
+- name: install hotfix (PS >= 4)
+  win_hotfix:
+    source: '{{ dot_net_security_hotfix_download_location }}\{{ dot_net_security_hotfix.file }}'
+    state: present
+  register: hotfix_install
+  when: ansible_powershell_version is version('4', '>=')
+
+- name: debug hotfix installation result
+  debug:
+    var: hotfix_install
+
+- name: ensure hotfix file is removed
+  win_file:
+    path: '{{ dot_net_security_hotfix_download_location }}\{{ dot_net_security_hotfix.file }}'
+    state: absent
+
+- name: reboot if needed
+  win_reboot:
+  when: hotfix_install.reboot_required | default(False)

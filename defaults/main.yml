@@ -29,6 +29,12 @@ enable_tls_support_hotfix:
   file: windows6.1-kb3154518-x64.msu
   url: http://download.microsoft.com/download/6/8/0/680ee424-358c-4fdf-a0de-b45dee07b711/windows6.1-kb3154518-x64.msu
 
+dot_net_security_hotfix_download_location: 'C:\Windows\Temp'
+dot_net_security_hotfix:
+  kb: KB2898850
+  file: Windows8.1-KB2898850-x64.msu
+  url: http://download.microsoft.com/download/C/6/9/C690CC33-18F7-405D-B18A-0A8E199E531C/Windows8.1-KB2898850-x64.msu
+
 #sdelete_download_url: http://web.archive.org/web/20140902022253/http://download.sysinternals.com/files/SDelete.zip
 bleachbit_download_url: https://download.bleachbit.org/BleachBit-4.0.0-portable.zip
 sdelete_download_url: https://download.sysinternals.com/files/SDelete.zip
