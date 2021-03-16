@@ -1,0 +1,13 @@
+---
+# this updates windows update which is needed to install further updates
+# see https://docs.microsoft.com/en-US/troubleshoot/windows-client/deployment/update-windows-update-agent
+
+- name: ensure Windows Update Agent on 2008 is installed
+  win_package:
+    path: "{{ windows_update_agent_url }}"
+    arguments:
+      - /quiet
+      - /norestart
+      - /wuforce
+    creates_path: C:\Windows\System32\wuaueng.dll
+    creates_version: 7.6.7600.320

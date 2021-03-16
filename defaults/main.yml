@@ -35,6 +35,8 @@ dot_net_security_hotfix:
   file: Windows8.1-KB2898850-x64.msu
   url: http://download.microsoft.com/download/C/6/9/C690CC33-18F7-405D-B18A-0A8E199E531C/Windows8.1-KB2898850-x64.msu
 
+windows_update_agent_url: http://download.windowsupdate.com/windowsupdate/redist/standalone/7.6.7600.320/windowsupdateagent-7.6-x64.exe
+
 #sdelete_download_url: http://web.archive.org/web/20140902022253/http://download.sysinternals.com/files/SDelete.zip
 bleachbit_download_url: https://download.bleachbit.org/BleachBit-4.0.0-portable.zip
 sdelete_download_url: https://download.sysinternals.com/files/SDelete.zip
