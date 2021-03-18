@@ -58,6 +58,7 @@ ovirt_guest_agent_role: oatakan.windows_ovirt_guest_agent
 virtio_role: oatakan.windows_virtio
 vmware_tools_role: oatakan.windows_vmware_tools
 virtualbox_guest_additions_role: oatakan.windows_virtualbox_guest_additions
+windows_update_role: oatakan.windows_update
 
 policy:
   allow_unauthenticated_guest_access: no
