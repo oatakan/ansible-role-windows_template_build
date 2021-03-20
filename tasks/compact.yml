@@ -27,6 +27,10 @@
     path: https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe
     product_id: '{9BE518E6-ECC6-35A9-88E4-87755C07200F}'
     arguments: '/qb!'
+  register: install_visual_c
+  until: install_visual_c is success
+  delay: 3
+  retries: 5
   when: "'Windows Server 2008' in ansible_distribution"
 
 - name: stop windows update service
