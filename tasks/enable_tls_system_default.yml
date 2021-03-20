@@ -6,6 +6,10 @@
   raw: '(New-Object -TypeName System.Net.WebClient).DownloadFile("{{ enable_tls_support_hotfix.url }}", "{{ enable_tls_support_hotfix_download_location }}\\{{ enable_tls_support_hotfix.file }}")'
   changed_when: False
   check_mode: no
+  register: download_hotfix
+  until: download_hotfix is success
+  delay: 3
+  retries: 5
 
 - name: delete scheduled task if it exists (hotfix)
   raw: 'SCHTASKS /Delete /TN hotfix_install /f'
