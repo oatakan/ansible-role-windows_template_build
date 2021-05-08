@@ -29,8 +29,8 @@
     arguments: '/qb!'
   register: install_visual_c
   until: install_visual_c is success
-  delay: 3
-  retries: 15
+  delay: 10
+  retries: 60
   when: "'Windows Server 2008' in ansible_distribution"
 
 - name: stop windows update service
