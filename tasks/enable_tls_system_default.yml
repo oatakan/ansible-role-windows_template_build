@@ -20,7 +20,7 @@
   ignore_errors: yes
 
 - name: create a scheduled task to install hotfix
-  raw: SCHTASKS /Create /SC MONTHLY /MO first /D SUN /TN hotfix_install /TR "{{ enable_tls_support_hotfix_download_location }}\\{{ enable_tls_support_hotfix.file }} /quiet /norestart"
+  raw: SCHTASKS /Create /SC MONTHLY /MO first /D SUN /TN hotfix_install /TR "{{ enable_tls_support_hotfix_download_location }}\\{{ enable_tls_support_hotfix.file }} /quiet /restart"
   args:
     executable: cmd.exe
   changed_when: False
@@ -34,7 +34,7 @@
   check_mode: no
 
 - pause:
-    seconds: 30
+    seconds: 60
 
 - name: delete scheduled task (hotfix)
   raw: 'SCHTASKS /Delete /TN hotfix_install /f'
