@@ -9,6 +9,8 @@
 - block:
     - name: enable powershell
       raw: '{{ item }}'
+      args:
+        executable: cmd.exe
       changed_when: False
       check_mode: no
       loop:
@@ -18,6 +20,8 @@
 
     - name: reboot system
       raw: shutdown /r /t 5
+      args:
+        executable: cmd.exe
       changed_when: False
       check_mode: no
 
