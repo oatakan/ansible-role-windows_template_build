@@ -1,5 +1,7 @@
 ---
 
+- include_tasks: enable_powershell.yml
+
 - include_tasks: enable_tls_system_default.yml
 
 - name: download script
