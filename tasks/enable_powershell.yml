@@ -1,32 +1,43 @@
 ---
 
-- name: check if powershell is available
-  raw: 'Get-Host'
-  failed_when: False
-  check_mode: no
-  register: check_powershell
-
 - block:
-    - name: enable powershell
-      raw: '{{ item }}'
-      args:
-        executable: cmd.exe
-      changed_when: False
+    - name: check if powershell is available
+      raw: 'Get-Host'
       check_mode: no
-      loop:
-        - dism /online /enable-feature /featurename:NetFx2-ServerCore
-        - dism /online /enable-feature /featurename:MicrosoftWindowsPowerShell
-        - dism /online /enable-feature /featurename:ServerManager-PSH-Cmdlets
+      changed_when: false
+  rescue:
+    - name: wait to see if powershell is being enabled
+      pause:
+        seconds: 120
 
-    - name: reboot system
-      raw: shutdown /r /t 5
-      args:
-        executable: cmd.exe
-      changed_when: False
+    - name: re-check if powershell is available
+      raw: 'Get-Host'
       check_mode: no
+      failed_when: false
+      changed_when: false
+      register: check_powershell
 
-    - pause:
-        seconds: 30
-  when:
-    - check_powershell.stderr is defined
-    - ('is not recognized' in check_powershell.stderr)
+    - block:
+        - name: enable powershell
+          raw: '{{ item }}'
+          args:
+            executable: cmd.exe
+          changed_when: False
+          check_mode: no
+          loop:
+            - dism /online /enable-feature /featurename:NetFx2-ServerCore
+            - dism /online /enable-feature /featurename:MicrosoftWindowsPowerShell
+            - dism /online /enable-feature /featurename:ServerManager-PSH-Cmdlets
+
+        - name: reboot system
+          raw: shutdown /r /t 5
+          args:
+            executable: cmd.exe
+          changed_when: False
+          check_mode: no
+
+        - pause:
+            seconds: 30
+      when:
+        - check_powershell.stderr is defined
+        - ('is not recognized' in check_powershell.stderr)
