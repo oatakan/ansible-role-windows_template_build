@@ -30,9 +30,9 @@ enable_tls_support_hotfix_download_location: 'C:\Windows\Temp'
 #  url: http://download.microsoft.com/download/6/8/0/680ee424-358c-4fdf-a0de-b45dee07b711/windows6.1-kb3154518-x64.msu
 
 enable_tls_support_hotfix:
-  kb: KB4056894
-  file: windows6.1-kb4056894-x64_4ddb21dbf40b3a7c41e17b4bf04242d8b48a5ac3.msu
-  url: http://download.windowsupdate.com/d/msdownload/update/software/secu/2018/01/windows6.1-kb4056894-x64_4ddb21dbf40b3a7c41e17b4bf04242d8b48a5ac3.msu
+  kb: KB3037574
+  file: windows6.1-kb3037574-x64_c9b0b83765a45811a4ab6f3f73b984a479a85732.msu
+  url: http://download.windowsupdate.com/c/msdownload/update/software/secu/2015/03/windows6.1-kb3037574-x64_c9b0b83765a45811a4ab6f3f73b984a479a85732.msu
 
 dot_net_security_hotfix_download_location: 'C:\Windows\Temp'
 dot_net_security_hotfix:
