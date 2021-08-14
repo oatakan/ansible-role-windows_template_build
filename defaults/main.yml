@@ -32,7 +32,7 @@ enable_tls_support_hotfix_download_location: 'C:\Windows\Temp'
 enable_tls_support_hotfix:
   kb: kb3125574
   file: windows6.1-kb3125574-v4-x64_2dafb1d203c8964239af3048b5dd4b1264cd93b9.msu
-  url: download.windowsupdate.com/d/msdownload/update/software/updt/2016/05/windows6.1-kb3125574-v4-x64_2dafb1d203c8964239af3048b5dd4b1264cd93b9.msu
+  url: http://download.windowsupdate.com/d/msdownload/update/software/updt/2016/05/windows6.1-kb3125574-v4-x64_2dafb1d203c8964239af3048b5dd4b1264cd93b9.msu
 
 dot_net_security_hotfix_download_location: 'C:\Windows\Temp'
 dot_net_security_hotfix:
