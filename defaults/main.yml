@@ -24,10 +24,15 @@ enable_tlsv12_hotfix:
   url: https://download.microsoft.com/download/F/4/1/F4154AD2-2119-48B4-BF99-CC15F68E110D/Windows6.1-KB3080079-x64.msu
 
 enable_tls_support_hotfix_download_location: 'C:\Windows\Temp'
+#enable_tls_support_hotfix:
+#  kb: kb3154518
+#  file: windows6.1-kb3154518-x64.msu
+#  url: http://download.microsoft.com/download/6/8/0/680ee424-358c-4fdf-a0de-b45dee07b711/windows6.1-kb3154518-x64.msu
+
 enable_tls_support_hotfix:
-  kb: kb3154518
-  file: windows6.1-kb3154518-x64.msu
-  url: http://download.microsoft.com/download/6/8/0/680ee424-358c-4fdf-a0de-b45dee07b711/windows6.1-kb3154518-x64.msu
+  kb: KB4056894
+  file: windows6.1-kb4056894-x64_4ddb21dbf40b3a7c41e17b4bf04242d8b48a5ac3.msu
+  url: http://download.windowsupdate.com/d/msdownload/update/software/secu/2018/01/windows6.1-kb4056894-x64_4ddb21dbf40b3a7c41e17b4bf04242d8b48a5ac3.msu
 
 dot_net_security_hotfix_download_location: 'C:\Windows\Temp'
 dot_net_security_hotfix:
