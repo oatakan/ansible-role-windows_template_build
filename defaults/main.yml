@@ -24,15 +24,17 @@ enable_tlsv12_hotfix:
   url: https://download.microsoft.com/download/F/4/1/F4154AD2-2119-48B4-BF99-CC15F68E110D/Windows6.1-KB3080079-x64.msu
 
 enable_tls_support_hotfix_download_location: 'C:\Windows\Temp'
+# no longer available
 #enable_tls_support_hotfix:
 #  kb: kb3154518
 #  file: windows6.1-kb3154518-x64.msu
 #  url: http://download.microsoft.com/download/6/8/0/680ee424-358c-4fdf-a0de-b45dee07b711/windows6.1-kb3154518-x64.msu
 
+# fix: https://support.microsoft.com/en-us/topic/security-and-quality-rollup-for-net-framework-3-5-1-for-windows-7-sp1-and-windows-server-2008-r2-sp1-kb-4040980-71f9f600-4878-a9d4-6b36-93cafad2eefe
 enable_tls_support_hotfix:
-  kb: kb3125574
-  file: windows6.1-kb3125574-v4-x64_2dafb1d203c8964239af3048b5dd4b1264cd93b9.msu
-  url: http://download.windowsupdate.com/d/msdownload/update/software/updt/2016/05/windows6.1-kb3125574-v4-x64_2dafb1d203c8964239af3048b5dd4b1264cd93b9.msu
+  kb: kb4040980
+  file: windows6.1-kb4040980-x64_83282fb5210091802984ead0d4175879056d602c.msu
+  url: http://download.windowsupdate.com/c/msdownload/update/software/secu/2017/09/windows6.1-kb4040980-x64_83282fb5210091802984ead0d4175879056d602c.msu
 
 dot_net_security_hotfix_download_location: 'C:\Windows\Temp'
 dot_net_security_hotfix:
