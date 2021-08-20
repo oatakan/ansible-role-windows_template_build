@@ -41,30 +41,13 @@
   failed_when: false
 
 - pause:
-    seconds: 60
+    seconds: 280
 
-- name: run scheduled task
-  raw: 'SCHTASKS /Run /TN upgrade'
-  args:
-    executable: cmd.exe
-  changed_when: False
-  check_mode: no
+- include_tasks: powershell_upgrade_scheduled_task.yml
 
-- pause:
-    seconds: "{{ upgrade_wait_timeout }}"
-
-- name: wait for powershell upgrade task to finish
-  raw: '((schtasks /query /TN upgrade)[4] -split " +")[-2]'
-  changed_when: False
-  check_mode: no
-  register: upgrade_status_check
-  failed_when: false
-  until: (upgrade_status_check.stdout | trim | lower) == 'ready'
-  delay: 10
-  retries: 10
-
-- debug:
-    msg: "{{ powershell_target_version }}"
+# retry if still not upgraded for some reason
+- include_tasks: powershell_upgrade_scheduled_task.yml
+  when: powershell_installed_version is version(powershell_target_version, '<')
 
 # apply winrm memory hotfix for powershell 3.0
 - include_tasks: winrm-memfix.yml
