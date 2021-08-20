@@ -2,37 +2,17 @@
 
 - include_tasks: enable_powershell.yml
 
-- include_tasks: enable_tls_system_default.yml
-
-- name: download script
-  raw: '[Net.ServicePointManager]::SecurityProtocol = [Enum]::ToObject([Net.SecurityProtocolType], 3072); (New-Object -TypeName System.Net.WebClient).DownloadFile("{{ powershell_script_url }}", "{{ powershell_upgrade_script_file }}")'
-  changed_when: False
-  check_mode: no
-  register: download_script
-
-- name: set execution policy
-  raw: 'Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force'
-  changed_when: False
-  check_mode: no
-  ignore_errors: yes
-
-- name: delete scheduled task if it exists
-  raw: 'SCHTASKS /Delete /TN upgrade /f'
-  args:
-    executable: cmd.exe
-  changed_when: False
-  check_mode: no
-  failed_when: False
-
-- name: create a scheduled task to run powershell script
-  raw: >
-    SCHTASKS /Create /SC MONTHLY /MO first /D SUN /TN upgrade /TR "powershell.exe -Command
-    '& {{ powershell_upgrade_script_file }} -Version {{ powershell_target_version }}
-    -Username {{ ansible_user }} -Password {{ ansible_password }}'"
-  args:
-    executable: cmd.exe
-  changed_when: False
-  check_mode: no
+# enable tls system_default
+# on Windows 7 SP1, TLS 1.1 and 1.2 is not enabled by default
+# this hotfix is needed to fix that
+# see https://support.microsoft.com/en-us/topic/support-for-tls-system-default-versions-included-in-the-net-framework-3-5-1-on-windows-7-sp1-and-server-2008-r2-sp1-5ef38dda-8e6c-65dc-c395-62d2df58715a
+- name: enable tls system_default
+  include_tasks: raw_hotfix_apply.yml
+  vars:
+    hotfix_download_url: "{{ enable_tls_support_hotfix.url }}"
+    hotfix_download_location: "{{ enable_tls_support_hotfix_download_location }}"
+    hotfix_file: "{{ enable_tls_support_hotfix.file }}"
+    hotfix_pause_seconds: 60
 
 - name: start windows update service
   raw: net start wuauserv
@@ -40,33 +20,64 @@
     executable: cmd.exe
   failed_when: false
 
-- pause:
-    seconds: 320
+- name: check powershell version (1/2)
+  raw: Write-Host "$($psversiontable.psversion.major).$($psversiontable.psversion.minor)"
+  changed_when: False
+  check_mode: no
+  ignore_errors: yes
+  register: powershell_current_version
 
-- include_tasks: powershell_upgrade_scheduled_task.yml
+- name: set installed powershell version (1/2)
+  set_fact:
+    powershell_installed_version: "{{ powershell_current_version.stdout | trim }}"
 
-# retry if still not upgraded for some reason
-- include_tasks: powershell_upgrade_scheduled_task.yml
+- name: debug powershell installed version (1/2)
+  debug:
+    msg: "installed powershell version: {{ powershell_installed_version }}"
+
+- name: debug powershell target version
+  debug:
+    msg: "target powershell version: {{ powershell_target_version }}"
+
+- name: ensure no wusa service is running for hotfix installation
+  raw: get-process wusa -ErrorAction SilentlyContinue
+  changed_when: False
+  check_mode: no
+  register: check_wusa_process
+  failed_when: false
+  until: check_wusa_process.rc != 0
+  delay: 60
+  retries: 10
+
+# install windows management framework 3.0 (upgrade to powershell 3.0)
+- name: install windows management framework 3.0 (upgrade to powershell 3.0)
+  include_tasks: raw_hotfix_apply.yml
+  vars:
+    hotfix_download_url: "{{ wmf_3_hotfix.url }}"
+    hotfix_download_location: "{{ wmf_3_hotfix_download_location }}"
+    hotfix_file: "{{ wmf_3_hotfix.file }}"
+    hotfix_pause_seconds: 240
   when: (powershell_installed_version|int) is version(powershell_target_version|int, '<')
 
+- name: check powershell version (2/2)
+  raw: Write-Host "$($psversiontable.psversion.major).$($psversiontable.psversion.minor)"
+  changed_when: False
+  check_mode: no
+  ignore_errors: yes
+  register: powershell_current_version
+
+- name: set installed powershell version (2/2)
+  set_fact:
+    powershell_installed_version: "{{ powershell_current_version.stdout | trim }}"
+
+- name: debug powershell installed version (2/2)
+  debug:
+    msg: "installed powershell version: {{ powershell_installed_version }}"
+
 # apply winrm memory hotfix for powershell 3.0
-- include_tasks: winrm-memfix.yml
-  when: powershell_target_version is version('3.0', '==')
-
-- name: wait for system to reboot after upgrade
-  wait_for_connection:
-    sleep: 60
-    timeout: 400
-
-- name: delete scheduled task
-  win_scheduled_task:
-    name: upgrade
-    state: absent
-
-- name: delete script
-  win_file:
-    path: "{{ powershell_upgrade_script_file }}"
-    state: absent
+- name: apply winrm memory hotfix for powershell 3.0
+  include_tasks: winrm-memfix.yml
+  when: powershell_installed_version|int is version(3, '==')
 
 - name: ensure auto login is disabled
   win_regedit:

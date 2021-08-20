@@ -36,6 +36,13 @@ enable_tls_support_hotfix:
   file: windows6.1-kb4040980-x64_83282fb5210091802984ead0d4175879056d602c.msu
   url: http://download.windowsupdate.com/c/msdownload/update/software/secu/2017/09/windows6.1-kb4040980-x64_83282fb5210091802984ead0d4175879056d602c.msu
 
+wmf_3_hotfix_download_location: 'C:\Windows\Temp'
+wmf_3_hotfix:
+  kb: kb2506143
+  file: Windows6.1-KB2506143-x64.msu
+  url: https://download.microsoft.com/download/E/7/6/E76850B8-DA6E-4FF5-8CCE-A24FC513FD16/Windows6.1-KB2506143-x64.msu
+
+
 dot_net_security_hotfix_download_location: 'C:\Windows\Temp'
 dot_net_security_hotfix:
   kb: KB2898850
