@@ -47,7 +47,7 @@
 
 # retry if still not upgraded for some reason
 - include_tasks: powershell_upgrade_scheduled_task.yml
-  when: powershell_installed_version is version(powershell_target_version, '<')
+  when: (powershell_installed_version|string) is version(powershell_target_version|string, '<')
 
 # apply winrm memory hotfix for powershell 3.0
 - include_tasks: winrm-memfix.yml
