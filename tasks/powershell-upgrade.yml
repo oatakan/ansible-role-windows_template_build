@@ -41,7 +41,7 @@
   failed_when: false
 
 - pause:
-    seconds: 280
+    seconds: 320
 
 - include_tasks: powershell_upgrade_scheduled_task.yml
 
