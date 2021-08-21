@@ -42,6 +42,11 @@ wmf_3_hotfix:
   file: Windows6.1-KB2506143-x64.msu
   url: https://download.microsoft.com/download/E/7/6/E76850B8-DA6E-4FF5-8CCE-A24FC513FD16/Windows6.1-KB2506143-x64.msu
 
+dot_net_452_download_location: 'C:\Windows\Temp'
+dot_net_452:
+  kb: kb2901907
+  file: NDP452-KB2901907-x86-x64-AllOS-ENU.exe
+  url: https://download.microsoft.com/download/E/2/1/E21644B5-2DF2-47C2-91BD-63C560427900/NDP452-KB2901907-x86-x64-AllOS-ENU.exe
 
 dot_net_security_hotfix_download_location: 'C:\Windows\Temp'
 dot_net_security_hotfix:

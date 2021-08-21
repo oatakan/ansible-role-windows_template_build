@@ -39,6 +39,30 @@
   debug:
     msg: "target powershell version: {{ powershell_target_version }}"
 
+- name: check to see if .NET needs to be installed
+  raw: |
+    # detect if .NET 4.5.2 is not installed
+    $dotnet_path = "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full"
+    $dotnet_upgrade_needed = $false
+    if (-not (Test-Path -Path $dotnet_path)) {
+        $dotnet_upgrade_needed = $true
+    } else {
+        $dotnet_version = Get-ItemProperty -Path $dotnet_path -Name Release -ErrorAction SilentlyContinue
+        if ($dotnet_version) {
+            # 379893 == 4.5.2
+            if ($dotnet_version.Release -lt 379893) {
+                $dotnet_upgrade_needed = $true
+            }
+        } else {
+            $dotnet_upgrade_needed = $true
+        }
+    }
+    return $dotnet_upgrade_needed
+  changed_when: False
+  check_mode: no
+  ignore_errors: yes
+  register: dot_net_required
+
 - name: ensure no wusa service is running for hotfix installation
   raw: get-process wusa -ErrorAction SilentlyContinue
   changed_when: False
@@ -48,6 +72,10 @@
   until: check_wusa_process.rc != 0
   delay: 60
   retries: 10
+
+- name: install .NET 4.5.2
+  include_tasks: dot_net_452_install.yml
+  when: ("True" in (dot_net_required.stdout | trim))  # bool doesn't work here because powershell 2.0 returns messy output
 
 # install windows management framework 3.0 (upgrade to powershell 3.0)
 - name: install windows management framework 3.0 (upgrade to powershell 3.0)
