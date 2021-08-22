@@ -1,6 +1,7 @@
 ---
 
-- include_tasks: powershell-upgrade.yml
+- include_role:
+    name: "{{ windows_powershell_upgrade_role }}"
   when: upgrade_powershell | bool
 
 - name: run setup module

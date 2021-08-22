@@ -9,12 +9,6 @@ temp_directory: "{{ ansible_env.TEMP }}"
 update_retry_limit: 10
 upgrade_wait_timeout: 600
 
-powershell_script_url: https://raw.githubusercontent.com/oatakan/ansible-role-windows-template-build/master/files/Upgrade-PowerShell.ps1
-powershell_upgrade_script_file: 'C:\Upgrade-PowerShell.ps1'
-
-ps_memfix_script_url: https://raw.githubusercontent.com/oatakan/ansible-role-windows-template-build/master/files/Install-WMF3Hotfix.ps1
-ps_memfix_script_file: 'C:\Install-WMF3Hotfix.ps1'
-
 set_network_to_private: '([Activator]::CreateInstance([Type]::GetTypeFromCLSID([Guid]"{DCB00C01-570F-4A9B-8D69-199FDBA5723B}"))).GetNetworkConnections() | % {$_.GetNetwork().SetCategory(1)}'
 
 enable_tlsv12_hotfix_download_location: "{{ ansible_env.TEMP }}"
@@ -35,18 +29,6 @@ enable_tls_support_hotfix:
   kb: kb4040980
   file: windows6.1-kb4040980-x64_83282fb5210091802984ead0d4175879056d602c.msu
   url: http://download.windowsupdate.com/c/msdownload/update/software/secu/2017/09/windows6.1-kb4040980-x64_83282fb5210091802984ead0d4175879056d602c.msu
-
-wmf_3_hotfix_download_location: 'C:\Windows\Temp'
-wmf_3_hotfix:
-  kb: kb2506143
-  file: Windows6.1-KB2506143-x64.msu
-  url: https://download.microsoft.com/download/E/7/6/E76850B8-DA6E-4FF5-8CCE-A24FC513FD16/Windows6.1-KB2506143-x64.msu
-
-dot_net_452_download_location: 'C:\Windows\Temp'
-dot_net_452:
-  kb: kb2901907
-  file: NDP452-KB2901907-x86-x64-AllOS-ENU.exe
-  url: https://download.microsoft.com/download/E/2/1/E21644B5-2DF2-47C2-91BD-63C560427900/NDP452-KB2901907-x86-x64-AllOS-ENU.exe
 
 dot_net_security_hotfix_download_location: 'C:\Windows\Temp'
 dot_net_security_hotfix:
@@ -78,6 +60,7 @@ virtio_role: oatakan.windows_virtio
 vmware_tools_role: oatakan.windows_vmware_tools
 virtualbox_guest_additions_role: oatakan.windows_virtualbox_guest_additions
 windows_update_role: oatakan.windows_update
+windows_powershell_upgrade_role: oatakan.windows_powershell_upgrade
 
 policy:
   allow_unauthenticated_guest_access: no
