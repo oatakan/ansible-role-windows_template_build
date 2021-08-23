@@ -21,6 +21,7 @@ A list of roles that this role utilizes:
 
 - oatakan.windows_ec2_ena_driver
 - oatakan.windows_ovirt_guest_agent
+- oatakan.windows_powershell_upgrade
 - oatakan.windows_update
 - oatakan.windows_virtio
 - oatakan.windows_vmware_tools
