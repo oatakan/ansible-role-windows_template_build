@@ -42,10 +42,6 @@
   register: hotfix_install
   when: ansible_powershell_version is version('3', '==')
 
-- name: debug hotfix installation result
-  debug:
-    var: hotfix_install
-
 - name: ensure hotfix file is removed
   win_file:
     path: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }}'
