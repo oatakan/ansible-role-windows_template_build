@@ -65,6 +65,9 @@
     name: "{{ ec2_ena_driver_role }}"
   when: target_ec2 | bool
 
+- name: run all handlers here
+  meta: flush_handlers
+
 - include_tasks: clean-up-components.yml
   when: clean_up_components | bool
 

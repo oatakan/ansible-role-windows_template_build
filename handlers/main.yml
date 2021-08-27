@@ -1,0 +1,10 @@
+---
+
+- name: ensure Windows ADK with DISM is removed
+  win_chocolatey:
+    name: windows-adk-deploy
+    state: absent
+  register: remove_win_adk_dism
+  until: remove_win_adk_dism is success
+  delay: 3
+  retries: 5

@@ -6,6 +6,7 @@
     state: present
     version: 10.0.17134.0
   register: install_windows_adk_deploy
+  notify: ensure Windows ADK with DISM is removed
 
 - name: ensure PATH contains Windows ADK
   win_path:
@@ -83,15 +84,6 @@
   loop:
     - 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319'
     - 'SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v4.0.30319'
-
-- name: ensure Windows ADK with DISM is removed
-  win_chocolatey:
-    name: windows-adk-deploy
-    state: absent
-  register: remove_win_adk_dism
-  until: remove_win_adk_dism is success
-  delay: 3
-  retries: 5
 
 - name: reboot if TLS config was applied
   win_reboot:
