@@ -25,12 +25,17 @@
   delay: 3
   retries: 5
 
-- name: install hotfix (PS >= 4)
-  win_hotfix:
-    source: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }}'
-    state: present
-  register: hotfix_install
-  when: ansible_powershell_version is version('4', '>=')
+- block:
+    - name: install hotfix (PS >= 4)
+      win_hotfix:
+        source: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }}'
+        state: present
+      register: hotfix_install
+      when: ansible_powershell_version is version('4', '>=')
+  rescue:
+    - name: install hotfix using shell
+      win_shell: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }} /quiet /norestart'
+      register: hotfix_install
 
 - name: install hotfix (PS == 3)
   win_shell: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }} /quiet /norestart'
