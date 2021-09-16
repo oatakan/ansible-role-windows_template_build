@@ -5,7 +5,7 @@ remove_apps: no
 clean_up_components: yes
 upgrade_powershell: no
 powershell_target_version: 3.0
-temp_directory: "{{ ansible_env.TEMP }}"
+temp_directory: 'C:\Windows\Temp'
 update_retry_limit: 10
 upgrade_wait_timeout: 600
 
@@ -47,8 +47,7 @@ windows_update_agent_url: http://download.windowsupdate.com/windowsupdate/redist
 #sdelete_download_url: http://web.archive.org/web/20140902022253/http://download.sysinternals.com/files/SDelete.zip
 bleachbit_download_url: https://download.bleachbit.org/BleachBit-4.0.0-portable.zip
 sdelete_download_url: https://download.sysinternals.com/files/SDelete.zip
-#ultradefrag_download_url: http://downloads.sourceforge.net/project/ultradefrag/stable-release/6.1.0/ultradefrag-portable-6.1.0.bin.amd64.zip
-ultradefrag_download_url: https://sourceforge.net/projects/ultradefrag/files/stable-release/7.1.4/ultradefrag-portable-7.1.4.bin.amd64.zip/download
+ultradefrag_download_url: https://downloads.sourceforge.net/project/ultradefrag/stable-release/7.1.4/ultradefrag-portable-7.1.4.bin.amd64.zip
 
 enable_auto_logon: yes
 

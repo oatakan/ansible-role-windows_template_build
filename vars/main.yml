@@ -1,5 +1,7 @@
 ---
 
+temp_directory: "{{ ansible_env.TEMP | default('C:\Windows\Temp') }}"
+
 unattend:
   administrator_password: "{{ local_administrator_password }}"
   local_accounts:
