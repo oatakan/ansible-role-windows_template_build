@@ -73,12 +73,13 @@
 
 - name: clean with bleachbit
   win_shell: >
-    '{{ ansible_user_dir }}\BleachBit-Portable\bleachbit_console.exe --clean deepscan.backup
+    '{{ ansible_user_dir }}\BleachBit-Portable\bleachbit_console.exe'
+    --clean deepscan.backup
     deepscan.ds_store deepscan.thumbs_db deepscan.tmp internet_explorer.cookies internet_explorer.forms
     internet_explorer.history internet_explorer.temporary_files system.clipboard system.custom system.logs
     system.memory_dump system.muicache system.prefetch system.recycle_bin system.tmp system.updates
     windows_defender.history windows_explorer.mru windows_explorer.recent_documents windows_explorer.run
-    windows_explorer.search_history windows_explorer.thumbnails > NUL'
+    windows_explorer.search_history windows_explorer.thumbnails 2> nul
   args:
     executable: cmd
   when:
@@ -164,6 +165,9 @@
 
 - name: remove bleachbit files
   win_file:
-    path: '{{ ansible_user_dir }}\BleachBit-Portable'
+    path: '{{ item }}'
     state: absent
   when: download_bleachbit is success
+  loop:
+    - '{{ temp_directory }}\BleachBit-portable.zip'
+    - '{{ ansible_user_dir }}\BleachBit-Portable'
