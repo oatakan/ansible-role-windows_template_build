@@ -2,7 +2,7 @@
 
 - block:
     - name: test SSL connection
-      win_shell: [System.Net.WebRequest]::Create('https://github.com').GetResponse()
+      win_shell: "[System.Net.WebRequest]::Create('https://github.com').GetResponse()"
 
   rescue:
     - name: enable TLSv1.2 support
