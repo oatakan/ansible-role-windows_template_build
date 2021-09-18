@@ -7,8 +7,10 @@
 - name: run setup module
   setup:
 
+- include_tasks: hotfix-tlsv12.yml
+  when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"
+
 - include_tasks: enable-tlsv12.yml
-  when: upgrade_powershell | bool
 
 - include_tasks: update-agent-win2008.yml
   when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"

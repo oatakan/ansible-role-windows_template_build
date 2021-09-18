@@ -1,0 +1,53 @@
+---
+
+- name: ensure Windows ADK with DISM is installed
+  win_chocolatey:
+    name: windows-adk-deploy
+    state: present
+    version: 10.0.17134.0
+  register: install_windows_adk_deploy
+  notify: ensure Windows ADK with DISM is removed
+
+- name: ensure PATH contains Windows ADK
+  win_path:
+    scope: machine
+    state: present
+    elements: "C:\\Program Files (x86)\\Windows Kits\\10\\Assessment and Deployment Kit\\Deployment Tools\\amd64\\DISM"
+
+- pause:
+    seconds: 10
+
+- name: download hotfix
+  win_get_url:
+    url: '{{ enable_tlsv12_hotfix.url }}'
+    dest: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }}'
+  register: download_hotfix
+  until: download_hotfix is success
+  delay: 3
+  retries: 5
+
+- block:
+    - name: install hotfix (PS >= 4)
+      win_hotfix:
+        source: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }}'
+        state: present
+      register: hotfix_install
+      when: ansible_powershell_version is version('4', '>=')
+  rescue:
+    - name: install hotfix using shell
+      win_shell: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }} /quiet /norestart'
+      register: hotfix_install
+
+- name: install hotfix (PS == 3)
+  win_shell: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }} /quiet /norestart'
+  register: hotfix_install
+  when: ansible_powershell_version is version('3', '==')
+
+- name: ensure hotfix file is removed
+  win_file:
+    path: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }}'
+    state: absent
+
+- name: reboot if needed
+  win_reboot:
+  when: hotfix_install.reboot_required | default(False)

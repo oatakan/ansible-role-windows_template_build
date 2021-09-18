@@ -1,90 +1,43 @@
 ---
 
-- name: ensure Windows ADK with DISM is installed
-  win_chocolatey:
-    name: windows-adk-deploy
-    state: present
-    version: 10.0.17134.0
-  register: install_windows_adk_deploy
-  notify: ensure Windows ADK with DISM is removed
-
-- name: ensure PATH contains Windows ADK
-  win_path:
-    scope: machine
-    state: present
-    elements: "C:\\Program Files (x86)\\Windows Kits\\10\\Assessment and Deployment Kit\\Deployment Tools\\amd64\\DISM"
-
-- pause:
-    seconds: 10
-
-- name: download hotfix
-  win_get_url:
-    url: '{{ enable_tlsv12_hotfix.url }}'
-    dest: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }}'
-  register: download_hotfix
-  until: download_hotfix is success
-  delay: 3
-  retries: 5
-
 - block:
-    - name: install hotfix (PS >= 4)
-      win_hotfix:
-        source: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }}'
-        state: present
-      register: hotfix_install
-      when: ansible_powershell_version is version('4', '>=')
+    - name: test SSL connection
+      win_shell: [System.Net.WebRequest]::Create('https://github.com').GetResponse()
+
   rescue:
-    - name: install hotfix using shell
-      win_shell: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }} /quiet /norestart'
-      register: hotfix_install
+    - name: enable TLSv1.2 support
+      win_regedit:
+        path: HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\{{ item.type }}
+        name: '{{ item.property }}'
+        data: '{{ item.value }}'
+        type: dword
+        state: present
+      register: enable_tls12
+      loop:
+        - type: Server
+          property: Enabled
+          value: 1
+        - type: Server
+          property: DisabledByDefault
+          value: 0
+        - type: Client
+          property: Enabled
+          value: 1
+        - type: Client
+          property: DisabledByDefault
+          value: 0
 
-- name: install hotfix (PS == 3)
-  win_shell: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }} /quiet /norestart'
-  register: hotfix_install
-  when: ansible_powershell_version is version('3', '==')
+    - name: enable strong crypto
+      win_regedit:
+        path: HKLM:\{{ item }}
+        name: SchUseStrongCrypto
+        data: 1
+        type: dword
+        state: present
+      loop:
+        - 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319'
+        - 'SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v4.0.30319'
 
-- name: ensure hotfix file is removed
-  win_file:
-    path: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }}'
-    state: absent
-
-- name: reboot if needed
-  win_reboot:
-  when: hotfix_install.reboot_required | default(False)
-
-- name: enable TLSv1.2 support
-  win_regedit:
-    path: HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\{{ item.type }}
-    name: '{{ item.property }}'
-    data: '{{ item.value }}'
-    type: dword
-    state: present
-  register: enable_tls12
-  loop:
-    - type: Server
-      property: Enabled
-      value: 1
-    - type: Server
-      property: DisabledByDefault
-      value: 0
-    - type: Client
-      property: Enabled
-      value: 1
-    - type: Client
-      property: DisabledByDefault
-      value: 0
-
-- name: enable strong crypto
-  win_regedit:
-    path: HKLM:\{{ item }}
-    name: SchUseStrongCrypto
-    data: 1
-    type: dword
-    state: present
-  loop:
-    - 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319'
-    - 'SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v4.0.30319'
-
-- name: reboot if TLS config was applied
-  win_reboot:
-  when: enable_tls12 is changed
+    - name: reboot if TLS config was applied
+      win_reboot:
+      when: enable_tls12 is changed
