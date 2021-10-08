@@ -45,7 +45,7 @@
 - include_tasks: policy.yml
 
 - include_tasks: power.yml
-  when: "'Server' not in ansible_distribution"
+  when: (ansible_os_product_type == 'workstation') | default(False)
 
 - include_tasks: enable-rdp.yml
 
@@ -58,10 +58,13 @@
     - not target_ovirt | bool
     - not target_vagrant | bool
 
-- include_tasks: remove-apps-alt-2.yml
+- block:
+    - include_tasks: remove-apps-alt-2.yml
+
+    - include_tasks: remove-onedrive.yml
   when:
     - remove_apps | bool
-    - "'Server' not in ansible_distribution"
+    - (ansible_os_product_type == 'workstation') | default(False)
 
 - include_role:
     name: "{{ ec2_ena_driver_role }}"
