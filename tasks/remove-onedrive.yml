@@ -8,6 +8,10 @@
   win_shell: '{{ ansible_env.SystemRoot }}\SysWOW64\OneDriveSetup.exe /uninstall'
   ignore_errors: yes
 
+- name: remove onedrivesync package
+  win_shell: get-appxpackage *Microsoft.OneDriveSync* | remove-appxpackage -AllUsers
+  ignore_errors: yes
+
 - name: remove onedrive directories
   win_file:
     path: '{{ item }}'
