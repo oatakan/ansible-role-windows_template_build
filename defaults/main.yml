@@ -37,10 +37,16 @@ dot_net_security_hotfix_download_location: 'C:\Windows\Temp'
 #  file: Windows8.1-KB2898850-x64.msu
 #  url: http://download.microsoft.com/download/C/6/9/C690CC33-18F7-405D-B18A-0A8E199E531C/Windows8.1-KB2898850-x64.msu
 
+# superseded
+# dot_net_security_hotfix:
+#   kb: KB2898850
+#   file: windows8.1-kb2898850-x64_9ffdfdeac9011569d1b14cf2dbf926257c50186d.msu
+#   url: http://download.windowsupdate.com/d/msdownload/update/software/secu/2014/04/windows8.1-kb2898850-x64_9ffdfdeac9011569d1b14cf2dbf926257c50186d.msu
+
 dot_net_security_hotfix:
-  kb: KB2898850
-  file: windows8.1-kb2898850-x64_9ffdfdeac9011569d1b14cf2dbf926257c50186d.msu
-  url: http://download.windowsupdate.com/d/msdownload/update/software/secu/2014/04/windows8.1-kb2898850-x64_9ffdfdeac9011569d1b14cf2dbf926257c50186d.msu
+  kb: KB2978041
+  file: windows8.1-kb2978041-x64_93d7dd68c7487670c0ab4d5eb154a0ef5e40a306.msu
+  url: http://download.windowsupdate.com/c/msdownload/update/software/secu/2014/09/windows8.1-kb2978041-x64_93d7dd68c7487670c0ab4d5eb154a0ef5e40a306.msu
 
 windows_update_agent_url: http://download.windowsupdate.com/windowsupdate/redist/standalone/7.6.7600.320/windowsupdateagent-7.6-x64.exe
 

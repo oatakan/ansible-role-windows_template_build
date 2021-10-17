@@ -17,16 +17,16 @@
         source: '{{ dot_net_security_hotfix_download_location }}\{{ dot_net_security_hotfix.file }}'
         state: present
       register: hotfix_install
-      when: ansible_powershell_version is version('4', '>=')
+#       when: ansible_powershell_version is version('4', '>=')
   rescue:
     - name: install hotfix using shell
       win_shell: '{{ dot_net_security_hotfix_download_location }}\{{ dot_net_security_hotfix.file }} /quiet /norestart'
       register: hotfix_install
 
-- name: install hotfix (PS == 3)
-  win_shell: '{{ dot_net_security_hotfix_download_location }}\{{ dot_net_security_hotfix.file }} /quiet /norestart'
-  register: hotfix_install
-  when: ansible_powershell_version is version('3', '==')
+# - name: install hotfix (PS == 3)
+#   win_shell: '{{ dot_net_security_hotfix_download_location }}\{{ dot_net_security_hotfix.file }} /quiet /norestart'
+#   register: hotfix_install
+#   when: ansible_powershell_version is version('3', '==')
 
 - name: ensure hotfix file is removed
   win_file:
