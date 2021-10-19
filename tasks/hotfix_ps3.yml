@@ -30,3 +30,5 @@
       win_file:
         path: '{{ temp_cab_directory }}'
         state: absent
+  vars:
+    temp_cab_directory: '{{ temp_directory }}\kb{{ hotfix_download.kb }}'
