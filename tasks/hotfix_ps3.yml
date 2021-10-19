@@ -1,0 +1,32 @@
+---
+
+- block:
+    - name: ensure temp directory exists
+      win_file:
+        path: '{{ temp_cab_directory }}'
+        state: directory
+
+    - name: extract hotfix
+      win_shell: Start-Process -FilePath 'wusa.exe' -ArgumentList '{{ hotfix_temp_directory }}\{{ hotfix_download.file }} /extract:{{ temp_cab_directory }}' -Wait
+
+    - name: get cab files
+      win_find:
+        paths: '{{ temp_cab_directory }}'
+        patterns:
+          - '*{{ hotfix_download.kb | upper }}*.cab'
+          - '*{{ hotfix_download.kb | lower }}*.cab'
+      register: get_cab_files
+
+    - name: install hotfix
+      win_shell: dism.exe /online /NoRestart /add-package /PackagePath:{{ item.path }}
+      loop: "{{ get_cab_files.files }}"
+      register: hotfix_install
+      failed_when:
+        - hotfix_install.rc > 0
+        - ('operation completed successfully' not in hotfix_install.stdout)
+
+  always:
+    - name: ensure temp directory removed
+      win_file:
+        path: '{{ temp_cab_directory }}'
+        state: absent

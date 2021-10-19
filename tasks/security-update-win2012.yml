@@ -12,21 +12,13 @@
   retries: 5
 
 - block:
-    - name: install hotfix (PS >= 4)
-      win_hotfix:
-        source: '{{ dot_net_security_hotfix_download_location }}\{{ dot_net_security_hotfix.file }}'
-        state: present
-      register: hotfix_install
-#       when: ansible_powershell_version is version('4', '>=')
+    - include_tasks: hotfix_ps4.yml
   rescue:
-    - name: install hotfix using shell
-      win_shell: '{{ dot_net_security_hotfix_download_location }}\{{ dot_net_security_hotfix.file }} /quiet /norestart'
-      register: hotfix_install
+    - include_tasks: hotfix_ps3.yml
+  vars:
+    hotfix_download: "{{ dot_net_security_hotfix }}"
+    hotfix_temp_directory: "{{ dot_net_security_hotfix_download_location }}"
 
-# - name: install hotfix (PS == 3)
-#   win_shell: '{{ dot_net_security_hotfix_download_location }}\{{ dot_net_security_hotfix.file }} /quiet /norestart'
-#   register: hotfix_install
-#   when: ansible_powershell_version is version('3', '==')
 
 - name: ensure hotfix file is removed
   win_file:

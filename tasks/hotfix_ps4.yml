@@ -1,0 +1,8 @@
+---
+
+- name: install hotfix - {{ hotfix_download.kb }} (PS >= 4)
+  win_hotfix:
+    hotfix_kb: '{{ hotfix_download.kb }}'
+    source: '{{ hotfix_temp_directory }}\{{ hotfix_download.file }}'
+    state: present
+  register: hotfix_install

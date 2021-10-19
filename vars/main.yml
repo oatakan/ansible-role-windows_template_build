@@ -1,6 +1,7 @@
 ---
 
 temp_directory: "{{ ansible_env.TEMP | default(default_temp_directory) }}"
+temp_cab_directory: '{{ temp_directory }}\kb{{ hotfix_kb }}'
 
 unattend:
   administrator_password: "{{ local_administrator_password }}"

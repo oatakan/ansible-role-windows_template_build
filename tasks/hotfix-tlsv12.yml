@@ -12,7 +12,7 @@
   win_path:
     scope: machine
     state: present
-    elements: "C:\\Program Files (x86)\\Windows Kits\\10\\Assessment and Deployment Kit\\Deployment Tools\\amd64\\DISM"
+    elements: 'C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\DISM'
 
 - pause:
     seconds: 10
@@ -27,21 +27,19 @@
   retries: 5
 
 - block:
-    - name: install hotfix (PS >= 4)
-      win_hotfix:
-        source: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }}'
-        state: present
-      register: hotfix_install
-      when: ansible_powershell_version is version('4', '>=')
+    - include_tasks: hotfix_ps4.yml
   rescue:
-    - name: install hotfix using shell
-      win_shell: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }} /quiet /norestart'
-      register: hotfix_install
+    - include_tasks: hotfix_ps3.yml
+  when: ansible_powershell_version is version('4', '>=')
+  vars:
+    hotfix_download: "{{ enable_tlsv12_hotfix }}"
+    hotfix_temp_directory: "{{ enable_tlsv12_hotfix_download_location }}"
 
-- name: install hotfix (PS == 3)
-  win_shell: '{{ enable_tlsv12_hotfix_download_location }}\{{ enable_tlsv12_hotfix.file }} /quiet /norestart'
-  register: hotfix_install
+- include_tasks: hotfix_ps3.yml
   when: ansible_powershell_version is version('3', '==')
+  vars:
+    hotfix_download: "{{ enable_tlsv12_hotfix }}"
+    hotfix_temp_directory: "{{ enable_tlsv12_hotfix_download_location }}"
 
 - name: ensure hotfix file is removed
   win_file:
@@ -50,4 +48,4 @@
 
 - name: reboot if needed
   win_reboot:
-  when: hotfix_install.reboot_required | default(False)
+  when: hotfix_install.reboot_required | default(True)
