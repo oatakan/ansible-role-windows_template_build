@@ -1,5 +1,17 @@
 ---
 
+- name: get Windows ADK uninstall command
+  win_reg_stat:
+    path: HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\{d794748d-72e9-45d7-9ab7-83d6c4c80f7f}
+    name: QuietUninstallString
+  register: windows_adk_uninstall_string
+
+- name: uninstall Windows ADK
+  win_shell: "{{ windows_adk_uninstall_string.value }}"
+  args:
+    executable: cmd
+  when: windows_adk_uninstall_string.value is defined
+
 - name: ensure Windows ADK with DISM is removed
   win_chocolatey:
     name: windows-adk-deploy

@@ -1,12 +1,24 @@
 ---
-
-- name: ensure Windows ADK with DISM is installed
-  win_chocolatey:
-    name: windows-adk-deploy
-    state: present
-    version: 10.0.17134.0
-  register: install_windows_adk_deploy
-  notify: ensure Windows ADK with DISM is removed
+- block:
+    - name: ensure Windows ADK with DISM is installed
+      win_package:
+        path: https://go.microsoft.com/fwlink/?linkid=873065 # version 10.0.17134.0
+        product_id: '{d794748d-72e9-45d7-9ab7-83d6c4c80f7f}'
+        expected_return_code:
+          - 0
+          - 3010
+        arguments: /quiet /norestart /features OptionId.DeploymentTools OptionId.WindowsPreinstallationEnvironment OptionId.ImagingAndConfigurationDesigner OptionId.UserStateMigrationTool
+      notify:
+        - get Windows ADK uninstall command
+        - uninstall Windows ADK
+  rescue:
+    - name: ensure Windows ADK with DISM is installed (chocolatey)
+      win_chocolatey:
+        name: windows-adk-deploy
+        state: present
+        version: 10.0.17134.0
+      register: install_windows_adk_deploy
+      notify: ensure Windows ADK with DISM is removed
 
 - name: ensure PATH contains Windows ADK
   win_path:
