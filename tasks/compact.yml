@@ -101,20 +101,23 @@
   until: download_ultradefrag is success
   delay: 3
   retries: 5
+  ignore_errors: true
 
-- name: unzip ultradefrag
-  win_unzip:
-    src: '{{ temp_directory }}\win_build\ultradefrag.zip'
-    dest: '{{ temp_directory }}\win_build'
+- block:
+    - name: unzip ultradefrag
+      win_unzip:
+        src: '{{ temp_directory }}\win_build\ultradefrag.zip'
+        dest: '{{ temp_directory }}\win_build'
 
-- name: set udefrag extract directory
-  set_fact:
-    udefrag_dir: '{{ temp_directory }}\win_build\ultradefrag-portable-7.1.4.amd64'
+    - name: set udefrag extract directory
+      set_fact:
+        udefrag_dir: '{{ temp_directory }}\win_build\ultradefrag-portable-7.1.4.amd64'
 
-- name: defrag with ultradefrag
-  win_shell: '{{ udefrag_dir }}\udefrag.exe --optimize --repeat C:'
-  args:
-    executable: cmd
+    - name: defrag with ultradefrag
+      win_shell: '{{ udefrag_dir }}\udefrag.exe --optimize --repeat C:'
+      args:
+        executable: cmd
+  when: download_ultradefrag is success
 
 - name: download sdelete
   win_get_url:
