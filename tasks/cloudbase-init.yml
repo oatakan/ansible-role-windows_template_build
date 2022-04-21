@@ -7,3 +7,7 @@
     arguments:
       - /qn
     state: present
+  register: install_cloudbase_init
+  until: install_cloudbase_init is success
+  delay: 3
+  retries: 5
