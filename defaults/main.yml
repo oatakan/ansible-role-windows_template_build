@@ -1,9 +1,9 @@
 ---
 
-install_updates: yes
-remove_apps: no
-clean_up_components: yes
-upgrade_powershell: no
+install_updates: true
+remove_apps: false
+clean_up_components: true
+upgrade_powershell: false
 powershell_target_version: 3.0
 default_temp_directory: 'C:\Windows\Temp'
 update_retry_limit: 10
@@ -55,15 +55,16 @@ bleachbit_download_url: https://download.bleachbit.org/BleachBit-4.0.0-portable.
 sdelete_download_url: https://download.sysinternals.com/files/SDelete.zip
 ultradefrag_download_url: https://downloads.sourceforge.net/project/ultradefrag/stable-release/7.1.4/ultradefrag-portable-7.1.4.bin.amd64.zip
 
-enable_auto_logon: yes
+enable_auto_logon: true
 
-target_ovirt: no
-target_qemu: no
-target_ec2: no
-target_vagrant: no
+target_ovirt: false
+target_qemu: false
+target_ec2: false
+target_vagrant: false
+target_openstack: false
 
-bleachbit_clean: yes
-bleachbit_free_disk_space: yes
+bleachbit_clean: true
+bleachbit_free_disk_space: true
 
 ec2_ena_driver_role: oatakan.windows_ec2_ena_driver
 ovirt_guest_agent_role: oatakan.windows_ovirt_guest_agent
@@ -74,13 +75,13 @@ windows_update_role: oatakan.windows_update
 windows_powershell_upgrade_role: oatakan.windows_powershell_upgrade
 
 policy:
-  allow_unauthenticated_guest_access: no
+  allow_unauthenticated_guest_access: false
 
 local_administrator_password: Chang3MyP@ssw0rd21
 local_account_username: ansible
 local_account_password: Chang3MyP@ssw0rd21
 
-shutdown_instance: yes
+shutdown_instance: true
 
 winsxs_cleanmgr_file:
   2008r2: '{{ ansible_env.windir }}\winsxs\amd64_microsoft-windows-cleanmgr_31bf3856ad364e35_6.1.7600.16385_none_c9392808773cd7da\cleanmgr.exe'

@@ -54,7 +54,7 @@
     - "'VMware' not in ansible_product_name"
     - "'VirtualBox' not in ansible_product_name"
     - ('KubeVirt' not in ansible_system_vendor | default(False))
-    - ('Red Hat' not in ansible_system_vendor | default(False))
+    - ('Red Hat' not in ansible_system_vendor | default(False)) or target_openstack | bool
     - not target_ovirt | bool
     - not target_vagrant | bool
 
