@@ -20,8 +20,25 @@
 
 - include_tasks: disable-auto-logon.yml
 
-- include_role:
-    name: "{{ windows_update_role }}"
+- block:
+    - include_role:
+        name: "{{ windows_configure_update_role }}"
+      vars:
+        role_action: register
+        wsus_server: "{{ win_update_server }}"
+        register_with_wsus: true
+      when: win_update_server | length > 0
+
+    - include_role:
+        name: "{{ windows_update_role }}"
+      vars:
+        win_update_server_selection: "{{ 'managed_server' if (win_update_server | length > 0) else 'default' }}"
+  always:
+    - include_role:
+        name: "{{ windows_configure_update_role }}"
+      vars:
+        role_action: unregister
+      when: win_update_server | length > 0
   when: install_updates | bool
 
 - include_role:

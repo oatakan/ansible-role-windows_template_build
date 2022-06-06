@@ -9,7 +9,9 @@ default_temp_directory: 'C:\Windows\Temp'
 update_retry_limit: 10
 upgrade_wait_timeout: 600
 
-set_network_to_private: '([Activator]::CreateInstance([Type]::GetTypeFromCLSID([Guid]"{DCB00C01-570F-4A9B-8D69-199FDBA5723B}"))).GetNetworkConnections() | % {$_.GetNetwork().SetCategory(1)}'
+win_update_server: '' #wsus server ip/hostname
+
+set_network_to_private: "([Activator]::CreateInstance([Type]::GetTypeFromCLSID([Guid]'{DCB00C01-570F-4A9B-8D69-199FDBA5723B}'))).GetNetworkConnections() | % {$_.GetNetwork().SetCategory(1)}"
 
 enable_tlsv12_hotfix_download_location: "{{ ansible_env.TEMP }}"
 enable_tlsv12_hotfix:
@@ -71,6 +73,7 @@ ovirt_guest_agent_role: oatakan.windows_ovirt_guest_agent
 virtio_role: oatakan.windows_virtio
 vmware_tools_role: oatakan.windows_vmware_tools
 virtualbox_guest_additions_role: oatakan.windows_virtualbox_guest_additions
+windows_configure_update_role: oatakan.windows_configure_update
 windows_update_role: oatakan.windows_update
 windows_powershell_upgrade_role: oatakan.windows_powershell_upgrade
 
