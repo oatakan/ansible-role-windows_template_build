@@ -22,3 +22,11 @@ autologin_registry:
     data: "{{ unattend.local_accounts[0].name }}"
   - name: DefaultPassword
     data: "{{ unattend.local_accounts[0].password }}"
+
+win_architecture_list:
+  arm_64_bit_processor: arm64
+  arm_32_bit_processor: arm
+  64_bit: amd64
+  32_bit: x86
+
+win_architecture: "{{ win_architecture_list[(ansible_architecture | default('64-bit'))|replace('-','_')|replace(' ','_')|lower] }}"
