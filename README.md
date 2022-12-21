@@ -27,6 +27,7 @@ A list of roles that this role utilizes:
 - oatakan.windows_virtio
 - oatakan.windows_vmware_tools
 - oatakan.windows_virtualbox_guest_additions
+- oatakan.windows_parallels_tools
 
 Example Playbook
 ----------------
