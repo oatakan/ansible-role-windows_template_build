@@ -47,15 +47,19 @@
 
 - include_role:
     name: "{{ virtio_role }}"
-  when: target_qemu | bool or ('KubeVirt' in ansible_system_vendor | default(''))
+  when: target_qemu | bool or ('KubeVirt' in (ansible_system_vendor | default('', true)))
 
 - include_role:
     name: "{{ virtualbox_guest_additions_role }}"
-  when: "'VirtualBox' in ansible_product_name"
+  when: ('VirtualBox' in (ansible_product_name | default('', true)))
 
 - include_role:
     name: "{{ vmware_tools_role }}"
-  when: "'VMware' in ansible_product_name"
+  when: ('VMware' in (ansible_product_name | default('', true)))
+
+- include_role:
+    name: "{{ parallels_tools_role }}"
+  when: ('Parallels' in (ansible_product_name | default('', true))) or (ansible_product_name == None and 'Parallels' in ansible_interfaces[0].interface_name)
 
 - include_tasks: startup.yml
 
@@ -68,10 +72,10 @@
 
 - include_tasks: cloudbase-init.yml
   when:
-    - "'VMware' not in ansible_product_name"
-    - "'VirtualBox' not in ansible_product_name"
-    - ('KubeVirt' not in ansible_system_vendor | default(False))
-    - ('Red Hat' not in ansible_system_vendor | default(False)) or target_openstack | bool
+    - ('VMware' not in (ansible_product_name | default('', true)))
+    - ('VirtualBox' not in (ansible_product_name | default('', true)))
+    - ('KubeVirt' not in (ansible_system_vendor | default('', true)))
+    - ('Red Hat' not in (ansible_system_vendor | default('', true))) or target_openstack | bool
     - not target_ovirt | bool
     - not target_vagrant | bool
 
