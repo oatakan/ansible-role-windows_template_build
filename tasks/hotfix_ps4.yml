@@ -1,8 +1,25 @@
 ---
 
-- name: install hotfix - {{ hotfix_download.kb }} (PS >= 4)
-  win_hotfix:
-    hotfix_kb: '{{ hotfix_download.kb }}'
-    source: '{{ hotfix_temp_directory }}\{{ hotfix_download.file }}'
-    state: present
-  register: hotfix_install
+- block:
+    - name: install hotfix - {{ hotfix_download.kb }} (PS >= 4)
+      win_hotfix:
+        hotfix_kb: '{{ hotfix_download.kb }}'
+        source: '{{ hotfix_temp_directory }}\{{ hotfix_download.file }}'
+        state: present
+      register: hotfix_install
+
+  rescue:
+    - name: ensure Windows ADK with DISM is installed (chocolatey)
+      win_chocolatey:
+        name: windows-adk-deploy
+        state: present
+        version: 10.0.17134.0
+      register: install_windows_adk_deploy
+      notify: ensure Windows ADK with DISM is removed
+
+    - name: retry install hotfix - {{ hotfix_download.kb }} (PS >= 4)
+      win_hotfix:
+        hotfix_kb: '{{ hotfix_download.kb }}'
+        source: '{{ hotfix_temp_directory }}\{{ hotfix_download.file }}'
+        state: present
+      register: hotfix_install
