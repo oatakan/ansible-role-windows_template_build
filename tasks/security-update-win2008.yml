@@ -3,8 +3,8 @@
 
 - name: download hotfix
   win_get_url:
-    url: '{{ 2008_security_update_hotfix.url }}'
-    dest: '{{ 2008_security_update_hotfix_download_location }}\{{ 2008_security_update_hotfix.file }}'
+    url: '{{ 2008r2_security_update_hotfix.url }}'
+    dest: '{{ 2008r2_security_update_hotfix_download_location }}\{{ 2008r2_security_update_hotfix.file }}'
   register: download_hotfix
   until: download_hotfix is success
   delay: 3
@@ -16,18 +16,18 @@
     - include_tasks: hotfix_ps3.yml
   when: ansible_powershell_version is version('4', '>=')
   vars:
-    hotfix_download: "{{ 2008_security_update_hotfix }}"
-    hotfix_temp_directory: "{{ 2008_security_update_hotfix_download_location }}"
+    hotfix_download: "{{ 2008r2_security_update_hotfix }}"
+    hotfix_temp_directory: "{{ 2008r2_security_update_hotfix_download_location }}"
 
 - include_tasks: hotfix_ps3.yml
   when: ansible_powershell_version is version('3', '==')
   vars:
-    hotfix_download: "{{ 2008_security_update_hotfix }}"
-    hotfix_temp_directory: "{{ 2008_security_update_hotfix_download_location }}"
+    hotfix_download: "{{ 2008r2_security_update_hotfix }}"
+    hotfix_temp_directory: "{{ 2008r2_security_update_hotfix_download_location }}"
 
 - name: ensure hotfix file is removed
   win_file:
-    path: '{{ 2008_security_update_hotfix_download_location }}\{{ 2008_security_update_hotfix.file }}'
+    path: '{{ 2008r2_security_update_hotfix_download_location }}\{{ 2008r2_security_update_hotfix.file }}'
     state: absent
 
 - name: reboot if needed

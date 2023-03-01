@@ -19,8 +19,8 @@ enable_tlsv12_hotfix:
   file: Windows6.1-KB3080079-x64.msu
   url: https://download.microsoft.com/download/F/4/1/F4154AD2-2119-48B4-BF99-CC15F68E110D/Windows6.1-KB3080079-x64.msu
 
-2008_security_update_hotfix_download_location: "{{ ansible_env.TEMP }}"
-2008_security_update_hotfix:
+2008r2_security_update_hotfix_download_location: "{{ ansible_env.TEMP }}"
+2008r2_security_update_hotfix:
   kb: KB4474419
   file: windows6.1-kb4474419-v3-x64_b5614c6cea5cb4e198717789633dca16308ef79c.msu
   url: http://catalog.s.download.windowsupdate.com/c/msdownload/update/software/secu/2019/09/windows6.1-kb4474419-v3-x64_b5614c6cea5cb4e198717789633dca16308ef79c.msu
