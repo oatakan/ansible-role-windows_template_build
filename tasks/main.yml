@@ -32,6 +32,7 @@
     loop_var: _hotfix
   when: "'Windows Server 2012' in ansible_distribution or 'Windows 8' in ansible_distribution"
 
+
 - include_tasks: disable_auto_logon.yml
 
 - block:

@@ -16,7 +16,7 @@
     state: directory
 
 - name: enable winrm
-  win_shell: '& $([scriptblock]::Create((New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"))) -ForceNewSSLCert -EnableCredSSP'
+  win_shell: '{{ enable_winrm_command }}'
   ignore_errors: yes
   when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"
 

@@ -76,7 +76,7 @@
                 </SynchronousCommand>
 {% endif %}
                 <SynchronousCommand wcm:action="add">
-                    <CommandLine>cmd.exe /c powershell -Command "& $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1'))) -ForceNewSSLCert -EnableCredSSP"</CommandLine>
+                    <CommandLine>cmd.exe /c powershell -Command "{{ enable_winrm_command }}"</CommandLine>
                     <Description>Enable winrm</Description>
                     <Order>2</Order>
                     <RequiresUserInput>true</RequiresUserInput>

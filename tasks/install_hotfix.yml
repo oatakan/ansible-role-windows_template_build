@@ -29,6 +29,31 @@
     path: '{{ hotfix_download_location }}\{{ _hotfix.file }}'
     state: absent
 
+- name: re-enable winrm after reboot
+  win_scheduled_task:
+    name: enable_winrm
+    description: Enable winrm
+    actions:
+      - path: powershell.exe
+        arguments: '-command "{{ enable_winrm_command }}"'
+    triggers:
+      - type: boot
+        delay: PT30S
+        enabled: true
+        user_id: SYSTEM
+    logon_type: service_account
+    username: SYSTEM
+    run_level: highest
+    state: present
+    enabled: true
+  when: _hotfix.enable_winrm | default(False)
+
 - name: reboot if needed
   win_reboot:
-  when: _hotfix.reboot | default(hotfix_install.reboot_required) | default(True)
+  when: (_hotfix.enable_winrm | default(False)) or (_hotfix.reboot | default(hotfix_install.reboot_required) | default(True))
+
+- name: remove re-enable scheduled task
+  win_scheduled_task:
+    name: enable_winrm
+    state: absent
+  when: _hotfix.enable_winrm | default(False)

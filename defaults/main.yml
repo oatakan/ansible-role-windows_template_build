@@ -38,7 +38,7 @@ win2012_hotfixes:
   - kb: KB3042058
     file: windows8.1-kb3042058-x64_c73bfac2ad93aed131627e7482bacbd89d0a0850.msu
     url: https://catalog.s.download.windowsupdate.com/d/msdownload/update/software/secu/2015/09/windows8.1-kb3042058-x64_c73bfac2ad93aed131627e7482bacbd89d0a0850.msu
-    reboot: false
+    enable_winrm: true
 
 win2008_hotfixes_archived:
   # no longer available
@@ -64,6 +64,7 @@ win2012_hotfixes_archived:
     file: windows8.1-kb2898850-x64_9ffdfdeac9011569d1b14cf2dbf926257c50186d.msu
     url: http://download.windowsupdate.com/d/msdownload/update/software/secu/2014/04/windows8.1-kb2898850-x64_9ffdfdeac9011569d1b14cf2dbf926257c50186d.msu
 
+enable_winrm_command: "& $([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1'))) -ForceNewSSLCert -EnableCredSSP"
 
 windows_update_agent_url: http://download.windowsupdate.com/windowsupdate/redist/standalone/7.6.7600.320/windowsupdateagent-7.6-x64.exe
 
