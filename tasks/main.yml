@@ -4,6 +4,9 @@
     name: "{{ windows_powershell_upgrade_role }}"
   when: upgrade_powershell | bool
 
+- name: wait for connection
+  wait_for_connection:
+
 - name: run setup module
   setup:
 
