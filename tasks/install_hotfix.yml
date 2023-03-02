@@ -1,0 +1,34 @@
+---
+
+- name: download hotfix
+  win_get_url:
+    url: '{{ _hotfix.url }}'
+    dest: '{{ hotfix_download_location }}\{{ _hotfix.file }}'
+  register: download_hotfix
+  until: download_hotfix is success
+  delay: 3
+  retries: 5
+
+- block:
+    - include_tasks: hotfix_ps4.yml
+  rescue:
+    - include_tasks: hotfix_ps3.yml
+  when: ansible_powershell_version is version('4', '>=')
+  vars:
+    hotfix_download: "{{ _hotfix }}"
+    hotfix_temp_directory: "{{ hotfix_download_location }}"
+
+- include_tasks: hotfix_ps3.yml
+  when: ansible_powershell_version is version('3', '==')
+  vars:
+    hotfix_download: "{{ _hotfix }}"
+    hotfix_temp_directory: "{{ hotfix_download_location }}"
+
+- name: ensure hotfix file is removed
+  win_file:
+    path: '{{ hotfix_download_location }}\{{ _hotfix.file }}'
+    state: absent
+
+- name: reboot if needed
+  win_reboot:
+  when: _hotfix.reboot | default(hotfix_install.reboot_required) | default(True)

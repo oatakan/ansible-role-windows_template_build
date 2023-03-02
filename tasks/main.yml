@@ -4,27 +4,35 @@
     name: "{{ windows_powershell_upgrade_role }}"
   when: upgrade_powershell | bool
 
-- name: wait for connection
-  wait_for_connection:
-
 - name: run setup module
   setup:
 
 - block:
-    - include_tasks: security-update-win2008.yml
+    # first we need to fix SSL connections with the hotfix
+    - include_tasks: install_hotfix.yml
+      vars:
+        _hotfix: win2008_hotfixes[0]
 
-    - include_tasks: hotfix-tlsv12.yml
+    - include_tasks: install_dism.yml
+
+    # enable TLS 1.2 with an hotfix
+    - include_tasks: install_hotfix.yml
+      vars:
+        _hotfix: win2008_hotfixes[1]
   when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"
 
-- include_tasks: enable-tlsv12.yml
+- include_tasks: enable_tlsv12.yml
 
-- include_tasks: update-agent-win2008.yml
+- include_tasks: update_agent_win2008.yml
   when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"
 
-- include_tasks: security-update-win2012.yml
+- include_tasks: install_hotfix.yml
+  loop: "{{ win2012_hotfixes }}"
+  loop_control:
+    loop_var: _hotfix
   when: "'Windows Server 2012' in ansible_distribution or 'Windows 8' in ansible_distribution"
 
-- include_tasks: disable-auto-logon.yml
+- include_tasks: disable_auto_logon.yml
 
 - block:
     - include_role:
@@ -74,7 +82,7 @@
 - include_tasks: power.yml
   when: (ansible_os_product_type == 'workstation') | default(False)
 
-- include_tasks: enable-rdp.yml
+- include_tasks: enable_rdp.yml
 
 - include_tasks: cloudbase-init.yml
   when:
@@ -86,9 +94,9 @@
     - not target_vagrant | bool
 
 - block:
-    - include_tasks: remove-apps-alt-2.yml
+    - include_tasks: remove_apps-alt-2.yml
 
-    - include_tasks: remove-onedrive.yml
+    - include_tasks: remove_onedrive.yml
   when:
     - remove_apps | bool
     - (ansible_os_product_type == 'workstation') | default(False)
@@ -100,10 +108,10 @@
 - name: run all handlers here
   meta: flush_handlers
 
-- include_tasks: clean-up-components.yml
+- include_tasks: clean_up_components.yml
   when: clean_up_components | bool
 
-- include_tasks: clean-up.yml
+- include_tasks: clean_up.yml
 
 - include_tasks: sysprep.yml
 

@@ -13,48 +13,57 @@ win_update_server: '' #wsus server ip/hostname
 
 set_network_to_private: "([Activator]::CreateInstance([Type]::GetTypeFromCLSID([Guid]'{DCB00C01-570F-4A9B-8D69-199FDBA5723B}'))).GetNetworkConnections() | % {$_.GetNetwork().SetCategory(1)}"
 
-enable_tlsv12_hotfix_download_location: "{{ ansible_env.TEMP }}"
-enable_tlsv12_hotfix:
-  kb: KB3080079
-  file: Windows6.1-KB3080079-x64.msu
-  url: https://download.microsoft.com/download/F/4/1/F4154AD2-2119-48B4-BF99-CC15F68E110D/Windows6.1-KB3080079-x64.msu
+hotfix_download_location: "{{ ansible_env.TEMP }}"
+win2008_hotfixes:
+  # this update is needed to support ssl support on Windows Server 2008 R2
+  - kb: KB4474419
+    file: windows6.1-kb4474419-v3-x64_b5614c6cea5cb4e198717789633dca16308ef79c.msu
+    url: http://catalog.s.download.windowsupdate.com/c/msdownload/update/software/secu/2019/09/windows6.1-kb4474419-v3-x64_b5614c6cea5cb4e198717789633dca16308ef79c.msu
+  # this is servicing stack update to enable any recent updates
+  - kb: KB3080079
+    file: Windows6.1-KB3080079-x64.msu
+    url: https://download.microsoft.com/download/F/4/1/F4154AD2-2119-48B4-BF99-CC15F68E110D/Windows6.1-KB3080079-x64.msu
 
-ssl_security_update_hotfix_download_location: "{{ ansible_env.TEMP }}"
-ssl_security_update_hotfix:
-  kb: KB4474419
-  file: windows6.1-kb4474419-v3-x64_b5614c6cea5cb4e198717789633dca16308ef79c.msu
-  url: http://catalog.s.download.windowsupdate.com/c/msdownload/update/software/secu/2019/09/windows6.1-kb4474419-v3-x64_b5614c6cea5cb4e198717789633dca16308ef79c.msu
+win2012_hotfixes:
+  # this update is needed to enable .NET clients to use https (tslv12) on Windows 8.1 and Windows Server 2012 R2
+  # see https://www.microsoft.com/en-us/download/confirmation.aspx?id=42883
+  - kb: KB2978041
+    file: windows8.1-kb2978041-x64_93d7dd68c7487670c0ab4d5eb154a0ef5e40a306.msu
+    url: http://download.windowsupdate.com/c/msdownload/update/software/secu/2014/09/windows8.1-kb2978041-x64_93d7dd68c7487670c0ab4d5eb154a0ef5e40a306.msu
+  # this is servicing stack update to enable any recent updates
+  - kb: KB5018922
+    file: windows8.1-kb5018922-x64_3aa7832b7586e11304f8fee5e09b6829b32d1833.msu
+    url: https://catalog.s.download.windowsupdate.com/c/msdownload/update/software/secu/2022/10/windows8.1-kb5018922-x64_3aa7832b7586e11304f8fee5e09b6829b32d1833.msu
+  # this a security update, it updates cipher suite for TLS, which prevents 'SSL: DH_KEY_TOO_SMALL' error with credssp
+  - kb: KB3042058
+    file: windows8.1-kb3042058-x64_c73bfac2ad93aed131627e7482bacbd89d0a0850.msu
+    url: https://catalog.s.download.windowsupdate.com/d/msdownload/update/software/secu/2015/09/windows8.1-kb3042058-x64_c73bfac2ad93aed131627e7482bacbd89d0a0850.msu
+    reboot: false
 
-enable_tls_support_hotfix_download_location: 'C:\Windows\Temp'
-# no longer available
-#enable_tls_support_hotfix:
-#  kb: kb3154518
-#  file: windows6.1-kb3154518-x64.msu
-#  url: http://download.microsoft.com/download/6/8/0/680ee424-358c-4fdf-a0de-b45dee07b711/windows6.1-kb3154518-x64.msu
+win2008_hotfixes_archived:
+  # no longer available
+  # enable tls support hotfix:
+  - kb: kb3154518
+    file: windows6.1-kb3154518-x64.msu
+    url: http://download.microsoft.com/download/6/8/0/680ee424-358c-4fdf-a0de-b45dee07b711/windows6.1-kb3154518-x64.msu
+  # fix: https://support.microsoft.com/en-us/topic/security-and-quality-rollup-for-net-framework-3-5-1-for-windows-7-sp1-and-windows-server-2008-r2-sp1-kb-4040980-71f9f600-4878-a9d4-6b36-93cafad2eefe
+  # enable tls support hotfix:
+  - kb: kb4040980
+    file: windows6.1-kb4040980-x64_83282fb5210091802984ead0d4175879056d602c.msu
+    url: http://download.windowsupdate.com/c/msdownload/update/software/secu/2017/09/windows6.1-kb4040980-x64_83282fb5210091802984ead0d4175879056d602c.msu
 
-# fix: https://support.microsoft.com/en-us/topic/security-and-quality-rollup-for-net-framework-3-5-1-for-windows-7-sp1-and-windows-server-2008-r2-sp1-kb-4040980-71f9f600-4878-a9d4-6b36-93cafad2eefe
-enable_tls_support_hotfix:
-  kb: kb4040980
-  file: windows6.1-kb4040980-x64_83282fb5210091802984ead0d4175879056d602c.msu
-  url: http://download.windowsupdate.com/c/msdownload/update/software/secu/2017/09/windows6.1-kb4040980-x64_83282fb5210091802984ead0d4175879056d602c.msu
+win2012_hotfixes_archived:
+  # no longer available
+  # dot net security hotfix:
+  - kb: KB2898850
+    file: Windows8.1-KB2898850-x64.msu
+    url: http://download.microsoft.com/download/C/6/9/C690CC33-18F7-405D-B18A-0A8E199E531C/Windows8.1-KB2898850-x64.msu
+  # superseded
+  # dot net security hotfix:
+  - kb: KB2898850
+    file: windows8.1-kb2898850-x64_9ffdfdeac9011569d1b14cf2dbf926257c50186d.msu
+    url: http://download.windowsupdate.com/d/msdownload/update/software/secu/2014/04/windows8.1-kb2898850-x64_9ffdfdeac9011569d1b14cf2dbf926257c50186d.msu
 
-dot_net_security_hotfix_download_location: 'C:\Windows\Temp'
-# no longer available
-#dot_net_security_hotfix:
-#  kb: KB2898850
-#  file: Windows8.1-KB2898850-x64.msu
-#  url: http://download.microsoft.com/download/C/6/9/C690CC33-18F7-405D-B18A-0A8E199E531C/Windows8.1-KB2898850-x64.msu
-
-# superseded
-# dot_net_security_hotfix:
-#   kb: KB2898850
-#   file: windows8.1-kb2898850-x64_9ffdfdeac9011569d1b14cf2dbf926257c50186d.msu
-#   url: http://download.windowsupdate.com/d/msdownload/update/software/secu/2014/04/windows8.1-kb2898850-x64_9ffdfdeac9011569d1b14cf2dbf926257c50186d.msu
-
-dot_net_security_hotfix:
-  kb: KB2978041
-  file: windows8.1-kb2978041-x64_93d7dd68c7487670c0ab4d5eb154a0ef5e40a306.msu
-  url: http://download.windowsupdate.com/c/msdownload/update/software/secu/2014/09/windows8.1-kb2978041-x64_93d7dd68c7487670c0ab4d5eb154a0ef5e40a306.msu
 
 windows_update_agent_url: http://download.windowsupdate.com/windowsupdate/redist/standalone/7.6.7600.320/windowsupdateagent-7.6-x64.exe
 
