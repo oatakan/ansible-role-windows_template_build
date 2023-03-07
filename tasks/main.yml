@@ -9,16 +9,18 @@
 
 - block:
     # first we need to fix SSL connections with the hotfix
-    - include_tasks: install_hotfix.yml
+    - include_role:
+        name: "{{ windows_hotfix_role }}"
       vars:
-        _hotfix: "{{ win2008_hotfixes[0] }}"
+        hotfix: "{{ win2008_hotfixes[0] }}"
 
     - include_tasks: install_dism.yml
 
     # enable TLS 1.2 with an hotfix
-    - include_tasks: install_hotfix.yml
+    - include_role:
+        name: "{{ windows_hotfix_role }}"
       vars:
-        _hotfix: "{{ win2008_hotfixes[1] }}"
+        hotfix: "{{ win2008_hotfixes[1] }}"
   when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"
 
 - include_tasks: enable_tlsv12.yml
@@ -26,10 +28,11 @@
 - include_tasks: update_agent_win2008.yml
   when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"
 
-- include_tasks: install_hotfix.yml
+- include_role:
+    name: "{{ windows_hotfix_role }}"
   loop: "{{ win2012_hotfixes }}"
   loop_control:
-    loop_var: _hotfix
+    loop_var: hotfix
   when: "'Windows Server 2012' in ansible_distribution or 'Windows 8' in ansible_distribution"
 
 

@@ -13,7 +13,6 @@ win_update_server: '' #wsus server ip/hostname
 
 set_network_to_private: "([Activator]::CreateInstance([Type]::GetTypeFromCLSID([Guid]'{DCB00C01-570F-4A9B-8D69-199FDBA5723B}'))).GetNetworkConnections() | % {$_.GetNetwork().SetCategory(1)}"
 
-hotfix_download_location: "{{ ansible_env.TEMP }}"
 win2008_hotfixes:
   # this update is needed to support ssl support on Windows Server 2008 R2
   - kb: KB4474419
@@ -93,6 +92,7 @@ parallels_tools_role: oatakan.windows_parallels_tools
 windows_configure_update_role: oatakan.windows_configure_update
 windows_update_role: oatakan.windows_update
 windows_powershell_upgrade_role: oatakan.windows_powershell_upgrade
+windows_hotfix_role: oatakan.windows_hotfix
 
 policy:
   allow_unauthenticated_guest_access: false
