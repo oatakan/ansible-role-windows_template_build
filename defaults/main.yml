@@ -96,6 +96,7 @@ windows_hotfix_role: oatakan.windows_hotfix
 
 policy:
   allow_unauthenticated_guest_access: false
+  disable_eos_reminder: true
 
 local_administrator_password: Chang3MyP@ssw0rd21
 local_account_username: ansible

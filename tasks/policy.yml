@@ -14,17 +14,19 @@
   when:
     - "'Windows 10' in ansible_distribution"
 
-- block:
-    - name: set connection profile to private (Windows 7)
-      win_shell: "{{ set_network_to_private }}"
-
-    - name: disable end of support notification (Windows 7)
-      win_regedit:
-        path: HKCU:\Software\Microsoft\Windows\CurrentVersion\EOSNotify
-        name: DiscontinueEOS
-        data: 1
-        type: dword
+- name: set connection profile to private (Windows 7)
+  win_shell: "{{ set_network_to_private }}"
   when: "'Windows 7' in ansible_distribution"
+
+- name: disable end of support notification (Windows 7,8)
+  win_regedit:
+    path: HKCU:\Software\Microsoft\Windows\CurrentVersion\EOSNotify
+    name: DiscontinueEOS
+    data: 1
+    type: dword
+  when:
+    - policy.disable_eos_reminder|bool
+    - ('Windows 7' in ansible_distribution) or ('Windows 8' in ansible_distribution)
 
 - name: Ensure local account password doesn't expire
   win_user:
