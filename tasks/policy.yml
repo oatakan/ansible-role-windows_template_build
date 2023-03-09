@@ -25,7 +25,7 @@
     data: 1
     type: dword
   when:
-    - policy.disable_eos_reminder|bool
+    - (policy.disable_eos_reminder | default(true))|bool
     - ('Windows 7' in ansible_distribution) or ('Windows 8' in ansible_distribution)
 
 - name: Ensure local account password doesn't expire
