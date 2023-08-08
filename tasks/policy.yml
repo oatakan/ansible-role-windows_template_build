@@ -9,6 +9,21 @@
     type: dword
   when: policy.allow_unauthenticated_guest_access|bool
 
+- block:
+    - name: enable WebDAV-Redirector feature on Server
+      win_feature:
+        name: WebDAV-Redirector
+        state: present
+      when: (ansible_os_product_type | default('server')) == 'server'
+
+    - name: set webclient maximum file size
+      win_regedit:
+        path: HKLM:\SYSTEM\CurrentControlSet\Services\WebClient\Parameters
+        name: FileSizeLimitinBytes
+        data: "{{ webclient_maximum_file_size }}"
+        type: dword
+  when: policy.install_webclient_service|bool
+
 - name: set connection profile to private (Windows 10)
   win_shell: Set-NetConnectionProfile -NetworkCategory Private
   when:

@@ -98,6 +98,9 @@ windows_hotfix_role: oatakan.windows_hotfix
 policy:
   allow_unauthenticated_guest_access: false
   disable_eos_reminder: true
+  install_webclient_service: false # installed on workstation by default, only applies to server
+
+webclient_maximum_file_size: 0xffffffff # 4GB default value is 50 MB
 
 local_administrator_password: Chang3MyP@ssw0rd21
 local_account_username: ansible
