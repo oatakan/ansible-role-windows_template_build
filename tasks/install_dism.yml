@@ -7,7 +7,7 @@
         expected_return_code:
           - 0
           - 3010
-        arguments: '{{ _arguments }}'
+        arguments: "{{ _arguments | join(' ') }}"
       notify:
         - get Windows ADK uninstall command
         - uninstall Windows ADK
@@ -29,7 +29,7 @@
             expected_return_code:
               - 0
               - 3010
-            arguments: '{{ _arguments }}'
+            arguments: "{{ _arguments | join(' ') }}"
           register: install_dism
           ignore_errors: true
           notify:
