@@ -3,22 +3,58 @@
     - name: ensure Windows ADK with DISM is installed
       win_package:
         path: https://go.microsoft.com/fwlink/?linkid=873065 # version 10.0.17134.0
-        product_id: '{d794748d-72e9-45d7-9ab7-83d6c4c80f7f}'
+        product_id: '{{ _product_id }}'
         expected_return_code:
           - 0
           - 3010
-        arguments: /quiet /norestart /features OptionId.DeploymentTools OptionId.WindowsPreinstallationEnvironment OptionId.ImagingAndConfigurationDesigner OptionId.UserStateMigrationTool
+        arguments: '{{ _arguments }}'
       notify:
         - get Windows ADK uninstall command
         - uninstall Windows ADK
   rescue:
-    - name: ensure Windows ADK with DISM is installed (chocolatey)
-      win_chocolatey:
-        name: windows-adk-deploy
-        state: present
-        version: 10.0.17134.0
-      register: install_windows_adk_deploy
-      notify: ensure Windows ADK with DISM is removed
+    - block:
+        - name: download DISM
+          win_get_url:
+            url: https://go.microsoft.com/fwlink/?linkid=873065
+            dest: '{{ temp_directory }}\adksetup.exe'
+          register: download_dism
+          retries: 5
+          delay: 5
+          until: download_dism is success
+
+        - name: ensure Windows ADK with DISM is installed (retry)
+          win_package:
+            path: '{{ temp_directory }}\adksetup.exe' # version 10.0.17134.0
+            product_id: '{{ _product_id }}'
+            expected_return_code:
+              - 0
+              - 3010
+            arguments: '{{ _arguments }}'
+          register: install_dism
+          ignore_errors: true
+          notify:
+            - get Windows ADK uninstall command
+            - uninstall Windows ADK
+      rescue:
+        - name: ensure Windows ADK with DISM is installed (chocolatey)
+          win_chocolatey:
+            name: windows-adk-deploy
+            state: present
+            version: 10.0.17134.0
+          register: install_windows_adk_deploy
+          ignore_errors: true
+          notify: ensure Windows ADK with DISM is removed
+  vars:
+    _product_id: '{d794748d-72e9-45d7-9ab7-83d6c4c80f7f}'
+    _arguments:
+      - /quiet
+      - /norestart
+      - /features {{ _features | join(' ') }}
+    _features:
+      - OptionId.DeploymentTools
+      - OptionId.WindowsPreinstallationEnvironment
+      - OptionId.ImagingAndConfigurationDesigner
+      - OptionId.UserStateMigrationTool
 
 - name: ensure PATH contains Windows ADK
   win_path:
