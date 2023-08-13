@@ -9,11 +9,29 @@
     type: dword
   when: policy.allow_unauthenticated_guest_access|bool
 
+# webdav support policy
 - block:
-    - name: enable WebDAV-Redirector feature on Server
-      win_feature:
-        name: WebDAV-Redirector
-        state: present
+    - block:
+        - name: enable WebDAV-Redirector feature on Server (2016+)
+          win_feature:
+            name: WebDAV-Redirector
+            state: present
+          register: enable_webdav_redirector
+          when:
+            - ('Windows Server 2008' not in ansible_distribution)
+            - ('Windows Server 2012' not in ansible_distribution)
+
+        - name: enable Desktop-Experience feature on Server (2008-2012)
+          win_feature:
+            name: Desktop-Experience
+            state: present
+          register: enable_desktop_experience
+          when: ('Windows Server 2008' in ansible_distribution or 'Windows Server 2012' in ansible_distribution)
+
+        - name: reboot if needed
+          win_reboot:
+          when: (enable_webdav_redirector is changed and enable_webdav_redirector.reboot_required) or (enable_desktop_experience is changed and enable_desktop_experience.reboot_required)
+
       when: (ansible_os_product_type | default('server')) == 'server'
 
     - name: set webclient maximum file size
@@ -29,7 +47,9 @@
         start_mode: auto
         state: started
 
-  when: policy.install_webclient_service|bool
+  when:
+    - policy.install_webclient_service|bool
+    - ansible_os_installation_type | default('server') | lower != 'server core'
 
 - name: set connection profile to private (Windows 10)
   win_shell: Set-NetConnectionProfile -NetworkCategory Private
