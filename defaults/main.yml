@@ -24,20 +24,25 @@ win2008_hotfixes:
     url: https://download.microsoft.com/download/F/4/1/F4154AD2-2119-48B4-BF99-CC15F68E110D/Windows6.1-KB3080079-x64.msu
 
 win2012_hotfixes:
-  # this update is needed to enable .NET clients to use https (tslv12) on Windows 8.1 and Windows Server 2012 R2
-  # see https://www.microsoft.com/en-us/download/confirmation.aspx?id=42883
-  - kb: KB2978041
-    file: windows8.1-kb2978041-x64_93d7dd68c7487670c0ab4d5eb154a0ef5e40a306.msu
-    url: http://download.windowsupdate.com/c/msdownload/update/software/secu/2014/09/windows8.1-kb2978041-x64_93d7dd68c7487670c0ab4d5eb154a0ef5e40a306.msu
-  # this is servicing stack update to enable any recent updates
-  - kb: KB5018922
-    file: windows8.1-kb5018922-x64_3aa7832b7586e11304f8fee5e09b6829b32d1833.msu
-    url: https://catalog.s.download.windowsupdate.com/c/msdownload/update/software/secu/2022/10/windows8.1-kb5018922-x64_3aa7832b7586e11304f8fee5e09b6829b32d1833.msu
-  # this a security update, it updates cipher suite for TLS, which prevents 'SSL: DH_KEY_TOO_SMALL' error with credssp
-  - kb: KB3042058
-    file: windows8.1-kb3042058-x64_c73bfac2ad93aed131627e7482bacbd89d0a0850.msu
-    url: https://catalog.s.download.windowsupdate.com/d/msdownload/update/software/secu/2015/09/windows8.1-kb3042058-x64_c73bfac2ad93aed131627e7482bacbd89d0a0850.msu
-    enable_winrm: true
+  os_6_2:
+    - kb: KB2901982
+      file: windows8-rt-kb2901982-x64_21dae8200edae3339a8c8580e516e00d7dacdfe3.msu
+      url: https://catalog.s.download.windowsupdate.com/d/msdownload/update/software/ftpk/2015/01/windows8-rt-kb2901982-x64_21dae8200edae3339a8c8580e516e00d7dacdfe3.msu
+  os_6_3:
+    # this update is needed to enable .NET clients to use https (tslv12) on Windows 8.1 and Windows Server 2012 R2
+    # see https://www.microsoft.com/en-us/download/confirmation.aspx?id=42883
+    - kb: KB2978041
+      file: windows8.1-kb2978041-x64_93d7dd68c7487670c0ab4d5eb154a0ef5e40a306.msu
+      url: http://download.windowsupdate.com/c/msdownload/update/software/secu/2014/09/windows8.1-kb2978041-x64_93d7dd68c7487670c0ab4d5eb154a0ef5e40a306.msu
+    # this is servicing stack update to enable any recent updates
+    - kb: KB5018922
+      file: windows8.1-kb5018922-x64_3aa7832b7586e11304f8fee5e09b6829b32d1833.msu
+      url: https://catalog.s.download.windowsupdate.com/c/msdownload/update/software/secu/2022/10/windows8.1-kb5018922-x64_3aa7832b7586e11304f8fee5e09b6829b32d1833.msu
+    # this a security update, it updates cipher suite for TLS, which prevents 'SSL: DH_KEY_TOO_SMALL' error with credssp
+    - kb: KB3042058
+      file: windows8.1-kb3042058-x64_c73bfac2ad93aed131627e7482bacbd89d0a0850.msu
+      url: https://catalog.s.download.windowsupdate.com/d/msdownload/update/software/secu/2015/09/windows8.1-kb3042058-x64_c73bfac2ad93aed131627e7482bacbd89d0a0850.msu
+      enable_winrm: true
 
 win2008_hotfixes_archived:
   # no longer available

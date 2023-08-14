@@ -30,7 +30,7 @@
 
 - include_role:
     name: "{{ windows_hotfix_role }}"
-  loop: "{{ win2012_hotfixes }}"
+  loop: "{{ win2012_hotfixes[os_version_name | default('os_6_3')] }}"
   loop_control:
     loop_var: hotfix
   when: "'Windows Server 2012' in ansible_distribution or 'Windows 8' in ansible_distribution"
