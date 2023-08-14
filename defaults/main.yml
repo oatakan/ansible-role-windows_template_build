@@ -27,7 +27,7 @@ win2012_hotfixes:
   os_6_2:
     - kb: KB2901982
       file: windows8-rt-kb2901982-x64_21dae8200edae3339a8c8580e516e00d7dacdfe3.msu
-      url: https://catalog.s.download.windowsupdate.com/d/msdownload/update/software/ftpk/2015/01/windows8-rt-kb2901982-x64_21dae8200edae3339a8c8580e516e00d7dacdfe3.msu
+      url: http://catalog.s.download.windowsupdate.com/d/msdownload/update/software/ftpk/2015/01/windows8-rt-kb2901982-x64_21dae8200edae3339a8c8580e516e00d7dacdfe3.msu
   os_6_3:
     # this update is needed to enable .NET clients to use https (tslv12) on Windows 8.1 and Windows Server 2012 R2
     # see https://www.microsoft.com/en-us/download/confirmation.aspx?id=42883
