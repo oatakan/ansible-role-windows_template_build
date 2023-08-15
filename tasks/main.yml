@@ -12,7 +12,7 @@
     # Default value is 1500
     - name: increase MaxConcurrentOperationsPerUser
       ansible.windows.win_shell: |
-        winrm set winrm/config/service @{MaxConcurrentOperationsPerUser="10000"}
+        winrm set winrm/config/service @{MaxConcurrentOperationsPerUser="20000"}
       args:
         executable: cmd
 
