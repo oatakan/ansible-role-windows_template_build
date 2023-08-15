@@ -8,6 +8,14 @@
   setup:
 
 - block:
+    # This is needed where many tasks and polls run against the windows target where it reaches the limit
+    # Default value is 1500
+    - name: increase MaxConcurrentOperationsPerUser
+      ansible.windows.win_shell: |
+        winrm set winrm/config/service @{MaxConcurrentOperationsPerUser="10000"}
+      args:
+        executable: cmd
+
     # first we need to fix SSL connections with the hotfix
     - include_role:
         name: "{{ windows_hotfix_role }}"
@@ -34,7 +42,6 @@
   loop_control:
     loop_var: hotfix
   when: "'Windows Server 2012' in ansible_distribution or 'Windows 8' in ansible_distribution"
-
 
 - include_tasks: disable_auto_logon.yml
 
