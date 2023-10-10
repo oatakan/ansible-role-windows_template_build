@@ -73,4 +73,4 @@
 - name: Ensure local account password doesn't expire
   win_user:
     name: "{{ ansible_user }}"
-    password_never_expires: yes
+    password_never_expires: true

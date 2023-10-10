@@ -17,7 +17,7 @@
 
 - name: enable winrm
   win_shell: '{{ enable_winrm_command }}'
-  ignore_errors: yes
+  ignore_errors: true
   when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"
 
 - name: copy unattend.xml
@@ -40,8 +40,8 @@
   win_scheduled_task:
     name: sysprep-shutdown
     username: SYSTEM
-    disallow_start_if_on_batteries: no
-    stop_if_going_on_batteries: no
+    disallow_start_if_on_batteries: false
+    stop_if_going_on_batteries: false
     actions:
     - path: powershell.exe
       arguments: Remove-Item -Path WSMan:\localhost\Listener\* -Recurse -Force
@@ -54,8 +54,8 @@
   win_scheduled_task:
     name: sysprep-shutdown
     username: SYSTEM
-    disallow_start_if_on_batteries: no
-    stop_if_going_on_batteries: no
+    disallow_start_if_on_batteries: false
+    stop_if_going_on_batteries: false
     actions:
     - path: powershell.exe
       arguments: Remove-Item -Path WSMan:\localhost\Listener\* -Recurse -Force

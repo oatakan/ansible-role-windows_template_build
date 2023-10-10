@@ -66,6 +66,13 @@
       when: win_update_server | length > 0
   when: install_updates | bool
 
+- name: ensure windows update service stopped and disabled
+  ansible.windows.win_service:
+    name: wuauserv
+    state: stopped
+    start_mode: disabled
+  ignore_errors: true
+
 - include_role:
     name: "{{ ovirt_guest_agent_role }}"
   when: target_ovirt | bool and not target_qemu | bool
@@ -127,6 +134,13 @@
 - include_tasks: sysprep.yml
 
 - include_tasks: compact.yml
+
+- name: ensure windows update service is enabled
+  ansible.windows.win_service:
+    name: wuauserv
+    state: stopped
+    start_mode: auto
+  ignore_errors: true
 
 - include_tasks: shutdown.yml
   when: shutdown_instance | bool

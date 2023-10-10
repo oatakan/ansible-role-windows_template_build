@@ -8,7 +8,7 @@
     direction: in
     protocol: tcp
     state: present
-    enabled: yes
+    enabled: true
 
 - name: enable RDP
   win_regedit:

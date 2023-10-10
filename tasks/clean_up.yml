@@ -16,7 +16,7 @@
   win_file:
     path: '{{ item }}'
     state: absent
-  ignore_errors: yes
+  ignore_errors: true
   loop:
     - C:\Temp
     - C:\Windows\Panther
@@ -24,7 +24,7 @@
 
 - name: cleanup the C:\Recovery folder
   win_shell: Remove-Item -Path C:\Recovery -Force -Recurse
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: check to see if WinSXS ManifestCache folder exist
   win_stat:

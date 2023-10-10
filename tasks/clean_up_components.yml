@@ -3,7 +3,7 @@
 - name: clean up components and update files
   win_shell: Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase
   when: "'Windows Server 2008' not in ansible_distribution"
-  ignore_errors: yes
+  ignore_errors: true
 
 - include_tasks: clean_up_with_cleanmgr.yml
   when: "'Windows Server 2008' in ansible_distribution"
@@ -11,4 +11,4 @@
 - name: clean up components and update files
   win_shell: Dism.exe /online /Cleanup-Image /SpSuperseded
   when: "'Windows Server 2008' in ansible_distribution"
-  ignore_errors: yes
+  ignore_errors: true

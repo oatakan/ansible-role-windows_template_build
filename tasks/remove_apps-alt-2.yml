@@ -83,7 +83,7 @@
   until: cleanup_win10_remove is successful
   retries: 5
   delay: 1
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: prevent suggested applications from returning
   win_regedit:

@@ -6,7 +6,7 @@
   until: cleanup_win10_remove is successful
   retries: 3
   delay: 1
-  ignore_errors: yes
+  ignore_errors: true
 
 #- name: disable windows store
 #  win_regedit:

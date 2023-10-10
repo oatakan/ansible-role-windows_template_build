@@ -33,17 +33,11 @@
   retries: 60
   when: "'Windows Server 2008' in ansible_distribution"
 
-- name: stop windows update service
-  win_service:
-    name: wuauserv
-    state: stopped
-  ignore_errors: yes
-
 - name: delete update directory
   win_file:
     path: C:\Windows\SoftwareDistribution\Download
     state: absent
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: remove windows update settings
   win_regedit:
@@ -55,21 +49,15 @@
     - PingID
     - AccountDomainSid
 
-- name: start windows update service
-  win_service:
-    name: wuauserv
-    state: started
-  ignore_errors: yes
-
 - name: create update directory
   win_file:
     path: C:\Windows\SoftwareDistribution\Download
     state: directory
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: reset windows update
   win_shell: wuauclt /resetauthorization /detectnow
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: clean with bleachbit
   win_shell: >
@@ -85,7 +73,7 @@
   when:
     - bleachbit_clean|bool
     - download_bleachbit is success
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: create temp directory
   win_file:
@@ -164,7 +152,7 @@
   when:
     - bleachbit_free_disk_space|bool
     - download_bleachbit is success
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: remove bleachbit files
   win_file:
