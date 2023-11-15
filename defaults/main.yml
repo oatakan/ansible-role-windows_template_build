@@ -12,6 +12,7 @@ upgrade_wait_timeout: 600
 win_update_server: '' #wsus server ip/hostname
 
 set_network_to_private: "([Activator]::CreateInstance([Type]::GetTypeFromCLSID([Guid]'{DCB00C01-570F-4A9B-8D69-199FDBA5723B}'))).GetNetworkConnections() | % {$_.GetNetwork().SetCategory(1)}"
+expand_disk: !unsafe "$i=(gwmi -n root/cimv2 Win32_DiskPartition|?{$_.BootPartition }).Index;'sel dis 0',\\\"sel par $($i*2+2)\\\",'extend'|& diskpart *>$null"
 
 win2008_hotfixes:
   # this update is needed to support ssl support on Windows Server 2008 R2

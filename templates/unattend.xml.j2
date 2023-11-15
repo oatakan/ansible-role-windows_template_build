@@ -62,35 +62,47 @@
             <FirstLogonCommands>
 {% if not 'Windows Server 2008' in ansible_distribution and not 'Windows 7' in ansible_distribution %}
                 <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "Resize-Partition -DriveLetter C -Size (Get-PartitionSupportedSize -DriveLetter C).Sizemax -ErrorAction SilentlyContinue"</CommandLine>
+                    <Description>Resize partition</Description>
+                    <Order>1</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
                     <CommandLine>cmd.exe /c powershell -Command "Set-NetConnectionProfile -NetworkCategory Private"</CommandLine>
                     <Description>Set network connection profile to private</Description>
-                    <Order>1</Order>
+                    <Order>2</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
 {% else %}
                 <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell –Command "{{ expand_disk }}"</CommandLine>
+                    <Description>Resize partition</Description>
+                    <Order>1</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
                     <CommandLine>cmd.exe /c powershell –Command "{{ set_network_to_private }}"</CommandLine>
                     <Description>Set network connection profile to private</Description>
-                    <Order>1</Order>
+                    <Order>2</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
 {% endif %}
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>cmd.exe /c powershell -Command "{{ enable_winrm_command }}"</CommandLine>
                     <Description>Enable winrm</Description>
-                    <Order>2</Order>
+                    <Order>3</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>cmd.exe /c powershell -Command "Enable-WSManCredSSP -Role Server -Force"</CommandLine>
                     <Description>Enable winrm server role</Description>
-                    <Order>3</Order>
+                    <Order>4</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>cmd.exe /c powershell -Command "Set-Item -Path 'WSMan:\localhost\Service\Auth\CredSSP' -Value $true"</CommandLine>
                     <Description>Enable credssp authentication</Description>
-                    <Order>4</Order>
+                    <Order>5</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
             </FirstLogonCommands>
