@@ -7,6 +7,11 @@
 - name: run setup module
   setup:
 
+- name: set os_version and os_version_name
+  ansible.builtin.set_fact:
+    os_version: "{{ ansible_kernel.split('.')[0] }}.{{ ansible_kernel.split('.')[1] }}"
+    os_version_name: "os_{{ ansible_kernel.split('.')[0] }}_{{ ansible_kernel.split('.')[1] }}"
+
 - block:
     # This is needed where many tasks and polls run against the windows target where it reaches the limit
     # Default value is 1500
