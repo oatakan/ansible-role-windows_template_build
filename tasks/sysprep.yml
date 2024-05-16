@@ -10,6 +10,18 @@
 #    data: C:\Windows\system32\sysprep\unattend.xml
 #    type: string
 
+- name: ensure cloudbase-init service is enabled
+  ansible.windows.win_service:
+    name: cloudbase-init
+    start_mode: auto
+  when:
+    - ('VMware' not in (ansible_product_name | default('', true)))
+    - ('VirtualBox' not in (ansible_product_name | default('', true)))
+    - ('KubeVirt' not in (ansible_system_vendor | default('', true)))
+    - ('Red Hat' not in (ansible_system_vendor | default('', true))) or target_openstack | bool
+    - not target_ovirt | bool
+    - not target_vagrant | bool
+
 - name: ensure Panther directory exists
   win_file:
     path: c:\Windows\Panther

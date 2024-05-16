@@ -11,3 +11,8 @@
   until: install_cloudbase_init is success
   delay: 3
   retries: 5
+
+- name: ensure cloudbase-init service is disabled
+  ansible.windows.win_service:
+    name: cloudbase-init
+    start_mode: disabled
