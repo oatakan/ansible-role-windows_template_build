@@ -1,12 +1,12 @@
 ---
 
 - name: Setup the xWebAdministration module
-  win_psmodule:
+  community.windows.win_psmodule:
     name: DSCR_AppxPackage
     state: present
 
 - name: remove packages
-  win_dsc:
+  ansible.windows.win_dsc:
     resource_name: cAppxProvisionedPackageSet
     Ensure: Absent
     PackageName:
@@ -84,14 +84,14 @@
   until: cleanup_win10_remove is successful
   retries: 3
   delay: 1
-  ignore_errors: true
+  failed_when: false
 
 - name: prevent suggested applications from returning
-  win_regedit:
+  ansible.windows.win_regedit:
     path: HKLM:\SOFTWARE\Policies\Microsoft\Windows\Cloud Content
     name: DisableWindowsConsumerFeatures
     data: 1
     datatype: dword
 
 - name: reboot to effect pending changes
-  win_reboot:
+  ansible.windows.win_reboot:

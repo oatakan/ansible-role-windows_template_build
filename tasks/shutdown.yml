@@ -1,5 +1,5 @@
 ---
 
 - name: run sysprep-shutdown scheduled task
-  win_shell: schtasks.exe /Run /TN "sysprep-shutdown"
-  ignore_errors: true
+  ansible.windows.win_shell: schtasks.exe /Run /TN "sysprep-shutdown"
+  failed_when: false

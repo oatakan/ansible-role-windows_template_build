@@ -1,12 +1,13 @@
 ---
 
-- block:
+- name: test SSL and enable TLSv1.2 if needed
+  block:
     - name: test SSL connection
-      win_shell: "[System.Net.WebRequest]::Create('https://github.com').GetResponse()"
+      ansible.windows.win_shell: "[System.Net.WebRequest]::Create('https://github.com').GetResponse()"
 
   rescue:
     - name: enable TLSv1.2 support
-      win_regedit:
+      ansible.windows.win_regedit:
         path: HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\{{ item.type }}
         name: '{{ item.property }}'
         data: '{{ item.value }}'
@@ -28,7 +29,7 @@
           value: 0
 
     - name: enable strong crypto
-      win_regedit:
+      ansible.windows.win_regedit:
         path: HKLM:\{{ item }}
         name: SchUseStrongCrypto
         data: 1
@@ -39,5 +40,5 @@
         - 'SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v4.0.30319'
 
     - name: reboot if TLS config was applied
-      win_reboot:
+      ansible.windows.win_reboot:
       when: enable_tls12 is changed

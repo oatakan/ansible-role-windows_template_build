@@ -1,7 +1,7 @@
 ---
 
 - name: disable auto login
-  win_regedit:
+  ansible.windows.win_regedit:
     path: HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon
     name: "{{ item.name }}"
     state: absent

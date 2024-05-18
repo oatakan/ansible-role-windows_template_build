@@ -1,7 +1,9 @@
 ---
-- block:
+
+- name: Windows ADK installation
+  block:
     - name: ensure Windows ADK with DISM is installed
-      win_package:
+      ansible.windows.win_package:
         path: https://go.microsoft.com/fwlink/?linkid=873065 # version 10.0.17134.0
         product_id: '{{ _product_id }}'
         expected_return_code:
@@ -12,9 +14,10 @@
         - get Windows ADK uninstall command
         - uninstall Windows ADK
   rescue:
-    - block:
+    - name: Windows ADK installation (retry)
+      block:
         - name: download DISM
-          win_get_url:
+          ansible.windows.win_get_url:
             url: https://go.microsoft.com/fwlink/?linkid=873065
             dest: '{{ temp_directory }}\adksetup.exe'
           register: download_dism
@@ -23,7 +26,7 @@
           until: download_dism is success
 
         - name: ensure Windows ADK with DISM is installed (retry)
-          win_package:
+          ansible.windows.win_package:
             path: '{{ temp_directory }}\adksetup.exe' # version 10.0.17134.0
             product_id: '{{ _product_id }}'
             expected_return_code:
@@ -31,18 +34,18 @@
               - 3010
             arguments: "{{ _arguments | join(' ') }}"
           register: install_dism
-          ignore_errors: true
+          failed_when: false
           notify:
             - get Windows ADK uninstall command
             - uninstall Windows ADK
       rescue:
         - name: ensure Windows ADK with DISM is installed (chocolatey)
-          win_chocolatey:
+          chocolatey.chocolatey.win_chocolatey:
             name: windows-adk-deploy
             state: present
             version: 10.0.17134.0
           register: install_windows_adk_deploy
-          ignore_errors: true
+          failed_when: false
           notify: ensure Windows ADK with DISM is removed
   vars:
     _product_id: '{d794748d-72e9-45d7-9ab7-83d6c4c80f7f}'
@@ -57,10 +60,11 @@
       - OptionId.UserStateMigrationTool
 
 - name: ensure PATH contains Windows ADK
-  win_path:
+  ansible.windows.win_path:
     scope: machine
     state: present
     elements: 'C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\DISM'
 
-- pause:
+- name: pause for 10 seconds
+  ansible.builtin.pause:
     seconds: 10

@@ -1,14 +1,14 @@
 ---
 
 - name: recompile .NET assemblies
-  win_dotnet_ngen:
+  community.windows.win_dotnet_ngen:
 
-#- name: enable custom answer file
-#  win_regedit:
-#    path: HKLM:\System\Setup
-#    name: UnattendFile
-#    data: C:\Windows\system32\sysprep\unattend.xml
-#    type: string
+# - name: enable custom answer file
+#   ansible.windows.win_regedit:
+#     path: HKLM:\System\Setup
+#     name: UnattendFile
+#     data: C:\Windows\system32\sysprep\unattend.xml
+#     type: string
 
 - name: ensure cloudbase-init service is enabled
   ansible.windows.win_service:
@@ -23,17 +23,17 @@
     - not target_vagrant | bool
 
 - name: ensure Panther directory exists
-  win_file:
+  ansible.windows.win_file:
     path: c:\Windows\Panther
     state: directory
 
 - name: enable winrm
-  win_shell: '{{ enable_winrm_command }}'
-  ignore_errors: true
+  ansible.windows.win_shell: '{{ enable_winrm_command }}'
+  failed_when: false
   when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"
 
 - name: copy unattend.xml
-  win_template:
+  ansible.windows.win_template:
     src: unattend.xml.j2
     dest: C:\Windows\system32\sysprep\unattend.xml
   when:
@@ -41,38 +41,41 @@
     - not target_ovirt | bool
     - not ('KubeVirt' in ansible_system_vendor | default('', true))
 
-#- name: run sysprep
-#  win_shell: C:\Windows\system32\sysprep\sysprep.exe /generalize /shutdown /oobe /quiet
-#  args:
-#    executable: cmd
-#  async: 1200
-#  poll: 0
+# - name: run sysprep
+#   ansible.windows.win_shell: C:\Windows\system32\sysprep\sysprep.exe /generalize /shutdown /oobe /quiet
+#   args:
+#     executable: cmd
+#   async: 1200
+#   poll: 0
 
 - name: create scheduled task to delete WinRM listeners and shutdown
-  win_scheduled_task:
+  community.windows.win_scheduled_task:
     name: sysprep-shutdown
     username: SYSTEM
     disallow_start_if_on_batteries: false
     stop_if_going_on_batteries: false
     actions:
-    - path: powershell.exe
-      arguments: Remove-Item -Path WSMan:\localhost\Listener\* -Recurse -Force
-    - path: C:\windows\system32\sysprep\sysprep.exe
-      arguments: /generalize /oobe /quiet /shutdown
-  when:
-    - ('VMware' not in (ansible_product_name | default('', true))) or ('VMware' in (ansible_product_name | default('', true)) and target_vagrant | bool) or (target_ovirt | bool) or ('KubeVirt' in ansible_system_vendor | default(''))
+      - path: powershell.exe
+        arguments: Remove-Item -Path WSMan:\localhost\Listener\* -Recurse -Force
+      - path: C:\windows\system32\sysprep\sysprep.exe
+        arguments: /generalize /oobe /quiet /shutdown
+  when: >
+    ('VMware' not in (ansible_product_name | default('', true))) or
+    ('VMware' in (ansible_product_name | default('', true)) and target_vagrant | bool) or
+    (target_ovirt | bool) or
+    ('KubeVirt' in ansible_system_vendor | default(''))
 
 - name: create scheduled task to delete WinRM listeners and shutdown
-  win_scheduled_task:
+  community.windows.win_scheduled_task:
     name: sysprep-shutdown
     username: SYSTEM
     disallow_start_if_on_batteries: false
     stop_if_going_on_batteries: false
     actions:
-    - path: powershell.exe
-      arguments: Remove-Item -Path WSMan:\localhost\Listener\* -Recurse -Force
-    - path: shutdown.exe
-      arguments: /s /t 10 /f /d p:4:1 /c "Ansible Shutdown"
+      - path: powershell.exe
+        arguments: Remove-Item -Path WSMan:\localhost\Listener\* -Recurse -Force
+      - path: shutdown.exe
+        arguments: /s /t 10 /f /d p:4:1 /c "Ansible Shutdown"
   when:
     - ('VMware' in (ansible_product_name | default('', true)))
     - not target_vagrant | bool
@@ -80,7 +83,7 @@
     - not ('KubeVirt' in (ansible_system_vendor | default('', true)))
 
 - name: set flag to recreate pagefile after next sysprep
-  win_shell: |
+  ansible.windows.win_shell: |
     $system = Get-WmiObject -Class Win32_ComputerSystem -EnableAllPrivileges
     if ($system -ne $null) {
         $system.AutomaticManagedPagefile = $true

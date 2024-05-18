@@ -3,7 +3,7 @@
 # see https://docs.microsoft.com/en-US/troubleshoot/windows-client/deployment/update-windows-update-agent
 
 - name: ensure Windows Update Agent on 2008 is installed
-  win_package:
+  ansible.windows.win_package:
     path: "{{ windows_update_agent_url }}"
     arguments:
       - /quiet

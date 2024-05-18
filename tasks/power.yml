@@ -1,16 +1,17 @@
 ---
 
-- block:
+- name: change power plan
+  block:
     - name: change power plan to high performance
-      win_power_plan:
+      community.windows.win_power_plan:
         name: high performance
 
   rescue:
     - name: use powershell to change plan to high performance
-      win_shell: |
+      ansible.windows.win_shell: |
         powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
         #powercfg /change monitor-timeout-ac 0
         powercfg /change disk-timeout-ac 0
         powercfg /change standby-timeout-ac 0
         powercfg /change hibernate-timeout-ac 0
-      ignore_errors: true
+      failed_when: false

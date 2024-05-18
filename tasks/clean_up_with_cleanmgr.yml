@@ -1,20 +1,23 @@
 ---
 
-- block:
+- name: clean up with rescue
+  block:
 
     - name: check for cleanmgr executable
-      win_stat:
+      ansible.windows.win_stat:
         path: '{{ ansible_env.windir }}\System32\cleanmgr.exe'
       register: check_cleanmgr_file
 
-    - include_tasks: copy_cleanmgr.yml
+    - name: copy cleanmgr (2008r2)
+      ansible.builtin.include_tasks: copy_cleanmgr.yml
       vars:
         os_short_name: 2008r2
       when:
         - not check_cleanmgr_file.stat.exists
         - ('Windows Server 2008 R2' in ansible_distribution)
 
-    - include_tasks: copy_cleanmgr.yml
+    - name: copy cleanmgr (2012)
+      ansible.builtin.include_tasks: copy_cleanmgr.yml
       vars:
         os_short_name: 2012
       when:
@@ -23,16 +26,16 @@
         - (not 'Windows Server 2012 R2' in ansible_distribution)
 
     - name: get free space
-      win_shell: Get-PSDrive C | Select-Object Free | ConvertTo-Json
+      ansible.windows.win_shell: Get-PSDrive C | Select-Object Free | ConvertTo-Json
       register: free_space_before_cleanup
 
     - name: ensure cleanup registry paths exist
-      win_regedit:
+      ansible.windows.win_regedit:
         path: HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\{{ item }}
       loop: "{{ cleanup_registry_keys }}"
 
     - name: set cleanup registry keys
-      win_regedit:
+      ansible.windows.win_regedit:
         path: HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\{{ item }}
         name: StateFlags0012
         data: 2
@@ -40,25 +43,26 @@
       loop: "{{ cleanup_registry_keys }}"
 
     - name: run cleanmgr
-      win_shell: cleanmgr /sagerun:12
+      ansible.windows.win_shell: cleanmgr /sagerun:12
 
     - name: wait for cleanmgr to finish
-      win_shell: (get-wmiobject win32_process | where-object {$_.processname -eq 'cleanmgr.exe'} | measure).count
+      ansible.windows.win_shell: (get-wmiobject win32_process | where-object {$_.processname -eq 'cleanmgr.exe'} | measure).count
       register: check_cleanmgr_process
       until: check_cleanmgr_process.stdout is defined and check_cleanmgr_process.stdout|int == 0
       delay: 5
       retries: 300
 
     - name: get free space
-      win_shell: Get-PSDrive C | Select-Object Free | ConvertTo-Json
+      ansible.windows.win_shell: Get-PSDrive C | Select-Object Free | ConvertTo-Json
       register: free_space_after_cleanup
 
-    - debug:
+    - name: show free space
+      ansible.builtin.debug:
         msg:
-          - "Free space before cleanup: {{ ((free_space_before_cleanup.stdout | from_json)['Free']|int / (1024*1024*1024)) | round(2, 'floor') }} GB"
-          - "Free space after cleanup: {{ ((free_space_after_cleanup.stdout | from_json)['Free']|int / (1024*1024*1024)) | round(2, 'floor') }} GB"
+          - "Free space before cleanup: {{ ((free_space_before_cleanup.stdout | from_json)['Free'] | int / (1024 * 1024 * 1024)) | round(2, 'floor') }} GB"
+          - "Free space after cleanup: {{ ((free_space_after_cleanup.stdout | from_json)['Free'] | int / (1024 * 1024 * 1024)) | round(2, 'floor') }} GB"
 
   rescue:
     - name: ignore any errors
-      debug:
+      ansible.builtin.debug:
         msg: "ignoring any error with clean up with cleanmgr"

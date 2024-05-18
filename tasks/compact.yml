@@ -1,12 +1,12 @@
 ---
 
 - name: ensure temp directory exists
-  win_file:
+  ansible.windows.win_file:
     path: '{{ temp_directory }}'
     state: directory
 
 - name: download bleachbit
-  win_get_url:
+  ansible.windows.win_get_url:
     url: '{{ bleachbit_download_url }}'
     dest: '{{ temp_directory }}\BleachBit-portable.zip'
   register: download_bleachbit
@@ -16,14 +16,14 @@
   when: bleachbit_download_url is defined
 
 - name: unzip bleachbit
-  win_unzip:
+  community.windows.win_unzip:
     src: '{{ temp_directory }}\BleachBit-portable.zip'
     dest: '{{ ansible_user_dir }}'
   when: download_bleachbit is success
 
 # This is needed on 2008 for bleachbit to work
 - name: install the visual C libraries
-  win_package:
+  ansible.windows.win_package:
     path: https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe
     product_id: '{9BE518E6-ECC6-35A9-88E4-87755C07200F}'
     arguments: '/qb!'
@@ -34,13 +34,13 @@
   when: "'Windows Server 2008' in ansible_distribution"
 
 - name: delete update directory
-  win_file:
+  ansible.windows.win_file:
     path: C:\Windows\SoftwareDistribution\Download
     state: absent
-  ignore_errors: true
+  failed_when: false
 
 - name: remove windows update settings
-  win_regedit:
+  ansible.windows.win_regedit:
     path: HKLM:\Software\Microsoft\Windows\CurrentVersion\WindowsUpdate
     name: "{{ item }}"
     state: absent
@@ -50,17 +50,17 @@
     - AccountDomainSid
 
 - name: create update directory
-  win_file:
+  ansible.windows.win_file:
     path: C:\Windows\SoftwareDistribution\Download
     state: directory
-  ignore_errors: true
+  failed_when: false
 
 - name: reset windows update
-  win_shell: wuauclt /resetauthorization /detectnow
-  ignore_errors: true
+  ansible.windows.win_shell: wuauclt /resetauthorization /detectnow
+  failed_when: false
 
 - name: clean with bleachbit
-  win_shell: >
+  ansible.windows.win_shell: >
     '{{ ansible_user_dir }}\BleachBit-Portable\bleachbit_console.exe'
     --clean deepscan.backup
     deepscan.ds_store deepscan.thumbs_db deepscan.tmp internet_explorer.cookies internet_explorer.forms
@@ -73,15 +73,15 @@
   when:
     - bleachbit_clean|bool
     - download_bleachbit is success
-  ignore_errors: true
+  failed_when: false
 
 - name: create temp directory
-  win_file:
+  ansible.windows.win_file:
     path: '{{ temp_directory }}\win_build'
     state: directory
 
 - name: download ultradefrag
-  win_get_url:
+  ansible.windows.win_get_url:
     url: '{{ ultradefrag_download_url }}'
     dest: '{{ temp_directory }}\win_build\ultradefrag.zip'
     follow_redirects: all
@@ -89,26 +89,27 @@
   until: download_ultradefrag is success
   delay: 3
   retries: 5
-  ignore_errors: true
+  failed_when: false
 
-- block:
+- name: ultradefrag
+  block:
     - name: unzip ultradefrag
-      win_unzip:
+      community.windows.win_unzip:
         src: '{{ temp_directory }}\win_build\ultradefrag.zip'
         dest: '{{ temp_directory }}\win_build'
 
     - name: set udefrag extract directory
-      set_fact:
+      ansible.builtin.set_fact:
         udefrag_dir: '{{ temp_directory }}\win_build\ultradefrag-portable-7.1.4.amd64'
 
     - name: defrag with ultradefrag
-      win_shell: '{{ udefrag_dir }}\udefrag.exe --optimize --repeat C:'
+      ansible.windows.win_shell: '{{ udefrag_dir }}\udefrag.exe --optimize --repeat C:'
       args:
         executable: cmd
   when: download_ultradefrag is success
 
 - name: download sdelete
-  win_get_url:
+  ansible.windows.win_get_url:
     url: '{{ sdelete_download_url }}'
     dest: '{{ temp_directory }}\win_build\SDelete.zip'
   register: download_sdelete
@@ -118,44 +119,44 @@
   when: sdelete_download_url is defined
 
 - name: copy sdelete
-  win_copy:
+  ansible.windows.win_copy:
     src: SDelete.zip
     dest: '{{ temp_directory }}\win_build\SDelete.zip'
   when: sdelete_download_url is undefined
 
 - name: unzip sdelete
-  win_unzip:
+  community.windows.win_unzip:
     src: '{{ temp_directory }}\win_build\SDelete.zip'
     dest: '{{ temp_directory }}\win_build'
 
 - name: accept sdelete eula
-  win_regedit:
+  ansible.windows.win_regedit:
     path: HKCU:\Software\Sysinternals\SDelete
     name: EulaAccepted
     data: 1
     type: dword
 
 - name: compact with sdelete
-  win_shell: '{{ temp_directory }}\win_build\sdelete.exe -q -z C:'
+  ansible.windows.win_shell: '{{ temp_directory }}\win_build\sdelete.exe -q -z C:'
   args:
     executable: cmd
 
 - name: remove temp files
-  win_file:
+  ansible.windows.win_file:
     path: '{{ temp_directory }}\win_build'
     state: absent
 
 - name: free disk space with bleachbit
-  win_shell: '{{ ansible_user_dir }}\BleachBit-Portable\bleachbit_console.exe --clean system.free_disk_space'
+  ansible.windows.win_shell: '{{ ansible_user_dir }}\BleachBit-Portable\bleachbit_console.exe --clean system.free_disk_space'
   args:
     executable: cmd
   when:
     - bleachbit_free_disk_space|bool
     - download_bleachbit is success
-  ignore_errors: true
+  failed_when: false
 
 - name: remove bleachbit files
-  win_file:
+  ansible.windows.win_file:
     path: '{{ item }}'
     state: absent
   when: download_bleachbit is success

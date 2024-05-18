@@ -2,7 +2,7 @@
 
 # do not enable this by default
 - name: allow unauthenticated guest access
-  win_regedit:
+  ansible.windows.win_regedit:
     path: HKLM:\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters
     name: AllowInsecureGuestAuth
     data: 1
@@ -10,10 +10,12 @@
   when: policy.allow_unauthenticated_guest_access|bool
 
 # webdav support policy
-- block:
-    - block:
+- name: webdav support policy
+  block:
+    - name: enable webdav feature
+      block:
         - name: enable WebDAV-Redirector feature on Server (2016+)
-          win_feature:
+          ansible.windows.win_feature:
             name: WebDAV-Redirector
             state: present
           register: enable_webdav_redirector
@@ -22,27 +24,29 @@
             - ('Windows Server 2012' not in ansible_distribution)
 
         - name: enable Desktop-Experience feature on Server (2008-2012)
-          win_feature:
+          ansible.windows.win_feature:
             name: Desktop-Experience
             state: present
           register: enable_desktop_experience
           when: ('Windows Server 2008' in ansible_distribution or 'Windows Server 2012' in ansible_distribution)
 
         - name: reboot if needed
-          win_reboot:
-          when: (enable_webdav_redirector is changed and enable_webdav_redirector.reboot_required) or (enable_desktop_experience is changed and enable_desktop_experience.reboot_required)
+          ansible.windows.win_reboot:
+          when: >
+            (enable_webdav_redirector is changed and enable_webdav_redirector.reboot_required) or
+            (enable_desktop_experience is changed and enable_desktop_experience.reboot_required)
 
       when: (ansible_os_product_type | default('server')) == 'server'
 
     - name: set webclient maximum file size
-      win_regedit:
+      ansible.windows.win_regedit:
         path: HKLM:\SYSTEM\CurrentControlSet\Services\WebClient\Parameters
         name: FileSizeLimitinBytes
         data: "{{ webclient_maximum_file_size }}"
         type: dword
 
     - name: ensure webclient service is started in auto mode
-      win_service:
+      ansible.windows.win_service:
         name: webclient
         start_mode: auto
         state: started
@@ -52,16 +56,15 @@
     - ansible_os_installation_type | default('server') | lower != 'server core'
 
 - name: set connection profile to private (Windows 10)
-  win_shell: Set-NetConnectionProfile -NetworkCategory Private
-  when:
-    - "'Windows 10' in ansible_distribution"
+  ansible.windows.win_shell: Set-NetConnectionProfile -NetworkCategory Private
+  when: ('Windows 10' in ansible_distribution)
 
 - name: set connection profile to private (Windows 7)
-  win_shell: "{{ set_network_to_private }}"
-  when: "'Windows 7' in ansible_distribution"
+  ansible.windows.win_shell: "{{ set_network_to_private }}"
+  when: ('Windows 7' in ansible_distribution)
 
 - name: disable end of support notification (Windows 7,8)
-  win_regedit:
+  ansible.windows.win_regedit:
     path: HKCU:\Software\Microsoft\Windows\CurrentVersion\EOSNotify
     name: DiscontinueEOS
     data: 1
@@ -71,6 +74,6 @@
     - ('Windows 7' in ansible_distribution) or ('Windows 8' in ansible_distribution)
 
 - name: Ensure local account password doesn't expire
-  win_user:
+  ansible.windows.win_user:
     name: "{{ ansible_user }}"
     password_never_expires: true

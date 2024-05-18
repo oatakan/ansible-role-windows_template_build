@@ -1,18 +1,20 @@
 ---
 
-- include_role:
+- name: windows powershell upgrade
+  ansible.builtin.include_role:
     name: "{{ windows_powershell_upgrade_role }}"
   when: upgrade_powershell | bool
 
 - name: run setup module
-  setup:
+  ansible.builtin.setup:
 
 - name: set os_version and os_version_name
   ansible.builtin.set_fact:
     os_version: "{{ ansible_kernel.split('.')[0] }}.{{ ansible_kernel.split('.')[1] }}"
     os_version_name: "os_{{ ansible_kernel.split('.')[0] }}_{{ ansible_kernel.split('.')[1] }}"
 
-- block:
+- name: fixes for Windows 2008 and Windows 7
+  block:
     # This is needed where many tasks and polls run against the windows target where it reaches the limit
     # Default value is 1500
     - name: increase MaxConcurrentOperationsPerUser
@@ -22,36 +24,45 @@
         executable: cmd
 
     # first we need to fix SSL connections with the hotfix
-    - include_role:
+    - name: apply hotfix for fixing SSL connections
+      ansible.builtin.include_role:
         name: "{{ windows_hotfix_role }}"
       vars:
         hotfix: "{{ win2008_hotfixes[0] }}"
 
-    - include_tasks: install_dism.yml
+    - name: install dism
+      ansible.builtin.include_tasks: install_dism.yml
 
     # enable TLS 1.2 with an hotfix
-    - include_role:
+    - name: apply hotfix for TLS v1.2
+      ansible.builtin.include_role:
         name: "{{ windows_hotfix_role }}"
       vars:
         hotfix: "{{ win2008_hotfixes[1] }}"
   when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"
 
-- include_tasks: enable_tlsv12.yml
+- name: enable TLS v1.2
+  ansible.builtin.include_tasks: enable_tlsv12.yml
 
-- include_tasks: update_agent_win2008.yml
+- name: update agent on Windows 2008 and Windows 7
+  ansible.builtin.include_tasks: update_agent_win2008.yml
   when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"
 
-- include_role:
+- name: apply hotfix for Windows 2012 and Windows 8
+  ansible.builtin.include_role:
     name: "{{ windows_hotfix_role }}"
   loop: "{{ win2012_hotfixes[os_version_name | default('os_6_3')] }}"
   loop_control:
     loop_var: hotfix
   when: "'Windows Server 2012' in ansible_distribution or 'Windows 8' in ansible_distribution"
 
-- include_tasks: disable_auto_logon.yml
+- name: disable auto logon
+  ansible.builtin.include_tasks: disable_auto_logon.yml
 
-- block:
-    - include_role:
+- name: configure and apply windows updates
+  block:
+    - name: register with windows update server
+      ansible.builtin.include_role:
         name: "{{ windows_configure_update_role }}"
       vars:
         role_action: register
@@ -59,12 +70,14 @@
         register_with_wsus: true
       when: win_update_server | length > 0
 
-    - include_role:
+    - name: apply windows updates
+      ansible.builtin.include_role:
         name: "{{ windows_update_role }}"
       vars:
         win_update_server_selection: "{{ 'managed_server' if (win_update_server | length > 0) else 'default' }}"
   always:
-    - include_role:
+    - name: unregister from windows update server
+      ansible.builtin.include_role:
         name: "{{ windows_configure_update_role }}"
       vars:
         role_action: unregister
@@ -76,38 +89,48 @@
     name: wuauserv
     state: stopped
     start_mode: disabled
-  ignore_errors: true
+  failed_when: false
 
-- include_role:
+- name: install ovirt guest agent
+  ansible.builtin.include_role:
     name: "{{ ovirt_guest_agent_role }}"
   when: target_ovirt | bool and not target_qemu | bool
 
-- include_role:
+- name: install virtio drivers
+  ansible.builtin.include_role:
     name: "{{ virtio_role }}"
   when: target_qemu | bool or ('KubeVirt' in (ansible_system_vendor | default('', true)))
 
-- include_role:
+- name: install virtualbox guest additions
+  ansible.builtin.include_role:
     name: "{{ virtualbox_guest_additions_role }}"
   when: ('VirtualBox' in (ansible_product_name | default('', true)))
 
-- include_role:
+- name: install vmware tools
+  ansible.builtin.include_role:
     name: "{{ vmware_tools_role }}"
   when: ('VMware' in (ansible_product_name | default('', true)))
 
-- include_role:
+- name: install parallels tools
+  ansible.builtin.include_role:
     name: "{{ parallels_tools_role }}"
   when: ('Parallels' in (ansible_product_name | default('', true))) or (ansible_product_name == None and 'Parallels' in ansible_interfaces[0].interface_name)
 
-- include_tasks: startup.yml
+- name: startup settings
+  ansible.builtin.include_tasks: startup.yml
 
-- include_tasks: policy.yml
+- name: apply policies
+  ansible.builtin.include_tasks: policy.yml
 
-- include_tasks: power.yml
+- name: adjust power settings
+  ansible.builtin.include_tasks: power.yml
   when: (ansible_os_product_type == 'workstation') | default(False)
 
-- include_tasks: enable_rdp.yml
+- name: enable rdp
+  ansible.builtin.include_tasks: enable_rdp.yml
 
-- include_tasks: cloudbase-init.yml
+- name: install cloudbase-init
+  ansible.builtin.include_tasks: cloudbase-init.yml
   when:
     - ('VMware' not in (ansible_product_name | default('', true)))
     - ('VirtualBox' not in (ansible_product_name | default('', true)))
@@ -116,36 +139,45 @@
     - not target_ovirt | bool
     - not target_vagrant | bool
 
-- block:
-    - include_tasks: remove_apps-alt-2.yml
+- name: remove apps and onedrive
+  block:
+    - name: remove apps
+      ansible.builtin.include_tasks: remove_apps-alt-2.yml
 
-    - include_tasks: remove_onedrive.yml
+    - name: remove onedrive
+      ansible.builtin.include_tasks: remove_onedrive.yml
   when:
     - remove_apps | bool
     - (ansible_os_product_type == 'workstation') | default(False)
 
-- include_role:
+- name: install ec2 ena driver
+  ansible.builtin.include_role:
     name: "{{ ec2_ena_driver_role }}"
   when: target_ec2 | bool
 
 - name: run all handlers here
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 
-- include_tasks: clean_up_components.yml
+- name: clean up components
+  ansible.builtin.include_tasks: clean_up_components.yml
   when: clean_up_components | bool
 
-- include_tasks: clean_up.yml
+- name: clean up system
+  ansible.builtin.include_tasks: clean_up.yml
 
-- include_tasks: sysprep.yml
+- name: sysprep
+  ansible.builtin.include_tasks: sysprep.yml
 
-- include_tasks: compact.yml
+- name: compact filesystem
+  ansible.builtin.include_tasks: compact.yml
 
 - name: ensure windows update service is enabled
   ansible.windows.win_service:
     name: wuauserv
     state: stopped
     start_mode: auto
-  ignore_errors: true
+  failed_when: false
 
-- include_tasks: shutdown.yml
+- name: shutdown
+  ansible.builtin.include_tasks: shutdown.yml
   when: shutdown_instance | bool

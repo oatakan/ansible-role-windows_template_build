@@ -29,4 +29,6 @@ win_architecture_list:
   64_bit: amd64
   32_bit: x86
 
-win_architecture: "{{ win_architecture_list[(ansible_architecture | default('64-bit'))|replace('-','_')|replace(' ','_')|lower] }}"
+win_architecture: "{{ win_architecture_list[(ansible_architecture | default('64-bit')) | replace('-', '_') | replace(' ', '_') | lower] }}"
+
+cloudbase_init_download_url: "{{ cloudbase_init_latest_download_url if (ansible_kernel is version('10', '>=')) else cloudbase_init_112_download_url }}"

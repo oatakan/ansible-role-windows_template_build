@@ -9,16 +9,23 @@ default_temp_directory: 'C:\Windows\Temp'
 update_retry_limit: 10
 upgrade_wait_timeout: 600
 
-win_update_server: '' #wsus server ip/hostname
+win_update_server: '' # wsus server ip/hostname
 
-set_network_to_private: "([Activator]::CreateInstance([Type]::GetTypeFromCLSID([Guid]'{DCB00C01-570F-4A9B-8D69-199FDBA5723B}'))).GetNetworkConnections() | % {$_.GetNetwork().SetCategory(1)}"
+set_network_to_private: >
+      ([Activator]::CreateInstance(
+      [Type]::GetTypeFromCLSID(
+      [Guid]'{DCB00C01-570F-4A9B-8D69-199FDBA5723B}'
+      ))).GetNetworkConnections() |
+      % {$_.GetNetwork().SetCategory(1)}
+
 expand_disk: !unsafe "$i=(gwmi -n root/cimv2 Win32_DiskPartition|?{$_.BootPartition }).Index;'sel dis 0',\\\"sel par $($i*2+2)\\\",'extend'|& diskpart *>$null"
 
 win2008_hotfixes:
   # this update is needed to support ssl support on Windows Server 2008 R2
   - kb: KB4474419
     file: windows6.1-kb4474419-v3-x64_b5614c6cea5cb4e198717789633dca16308ef79c.msu
-    url: http://catalog.s.download.windowsupdate.com/c/msdownload/update/software/secu/2019/09/windows6.1-kb4474419-v3-x64_b5614c6cea5cb4e198717789633dca16308ef79c.msu
+    url: |
+      http://catalog.s.download.windowsupdate.com/c/msdownload/update/software/secu/2019/09/windows6.1-kb4474419-v3-x64_b5614c6cea5cb4e198717789633dca16308ef79c.msu
   # this is servicing stack update to enable any recent updates
   - kb: KB3080079
     file: Windows6.1-KB3080079-x64.msu
@@ -28,21 +35,25 @@ win2012_hotfixes:
   os_6_2:
     - kb: KB2901982
       file: windows8-rt-kb2901982-x64_21dae8200edae3339a8c8580e516e00d7dacdfe3.msu
-      url: http://catalog.s.download.windowsupdate.com/d/msdownload/update/software/ftpk/2015/01/windows8-rt-kb2901982-x64_21dae8200edae3339a8c8580e516e00d7dacdfe3.msu
+      url: |
+        http://catalog.s.download.windowsupdate.com/d/msdownload/update/software/ftpk/2015/01/windows8-rt-kb2901982-x64_21dae8200edae3339a8c8580e516e00d7dacdfe3.msu
   os_6_3:
     # this update is needed to enable .NET clients to use https (tslv12) on Windows 8.1 and Windows Server 2012 R2
     # see https://www.microsoft.com/en-us/download/confirmation.aspx?id=42883
     - kb: KB2978041
       file: windows8.1-kb2978041-x64_93d7dd68c7487670c0ab4d5eb154a0ef5e40a306.msu
-      url: http://download.windowsupdate.com/c/msdownload/update/software/secu/2014/09/windows8.1-kb2978041-x64_93d7dd68c7487670c0ab4d5eb154a0ef5e40a306.msu
+      url: |
+        http://download.windowsupdate.com/c/msdownload/update/software/secu/2014/09/windows8.1-kb2978041-x64_93d7dd68c7487670c0ab4d5eb154a0ef5e40a306.msu
     # this is servicing stack update to enable any recent updates
     - kb: KB5018922
       file: windows8.1-kb5018922-x64_3aa7832b7586e11304f8fee5e09b6829b32d1833.msu
-      url: https://catalog.s.download.windowsupdate.com/c/msdownload/update/software/secu/2022/10/windows8.1-kb5018922-x64_3aa7832b7586e11304f8fee5e09b6829b32d1833.msu
+      url: |
+        https://catalog.s.download.windowsupdate.com/c/msdownload/update/software/secu/2022/10/windows8.1-kb5018922-x64_3aa7832b7586e11304f8fee5e09b6829b32d1833.msu
     # this a security update, it updates cipher suite for TLS, which prevents 'SSL: DH_KEY_TOO_SMALL' error with credssp
     - kb: KB3042058
       file: windows8.1-kb3042058-x64_c73bfac2ad93aed131627e7482bacbd89d0a0850.msu
-      url: https://catalog.s.download.windowsupdate.com/d/msdownload/update/software/secu/2015/09/windows8.1-kb3042058-x64_c73bfac2ad93aed131627e7482bacbd89d0a0850.msu
+      url: |
+        https://catalog.s.download.windowsupdate.com/d/msdownload/update/software/secu/2015/09/windows8.1-kb3042058-x64_c73bfac2ad93aed131627e7482bacbd89d0a0850.msu
       enable_winrm: true
 
 win2008_hotfixes_archived:
@@ -51,7 +62,8 @@ win2008_hotfixes_archived:
   - kb: kb3154518
     file: windows6.1-kb3154518-x64.msu
     url: http://download.microsoft.com/download/6/8/0/680ee424-358c-4fdf-a0de-b45dee07b711/windows6.1-kb3154518-x64.msu
-  # fix: https://support.microsoft.com/en-us/topic/security-and-quality-rollup-for-net-framework-3-5-1-for-windows-7-sp1-and-windows-server-2008-r2-sp1-kb-4040980-71f9f600-4878-a9d4-6b36-93cafad2eefe
+  # fix:
+  # https://support.microsoft.com/en-us/topic/security-and-quality-rollup-for-net-framework-3-5-1-for-windows-7-sp1-and-windows-server-2008-r2-sp1-kb-4040980-71f9f600-4878-a9d4-6b36-93cafad2eefe
   # enable tls support hotfix:
   - kb: kb4040980
     file: windows6.1-kb4040980-x64_83282fb5210091802984ead0d4175879056d602c.msu
@@ -74,10 +86,13 @@ enable_winrm_command: "& $([scriptblock]::Create((New-Object Net.WebClient).Down
 
 windows_update_agent_url: http://download.windowsupdate.com/windowsupdate/redist/standalone/7.6.7600.320/windowsupdateagent-7.6-x64.exe
 
-#sdelete_download_url: http://web.archive.org/web/20140902022253/http://download.sysinternals.com/files/SDelete.zip
+# sdelete_download_url: http://web.archive.org/web/20140902022253/http://download.sysinternals.com/files/SDelete.zip
 bleachbit_download_url: https://download.bleachbit.org/BleachBit-4.0.0-portable.zip
 sdelete_download_url: https://download.sysinternals.com/files/SDelete.zip
 ultradefrag_download_url: https://downloads.sourceforge.net/project/ultradefrag/stable-release/7.1.4/ultradefrag-portable-7.1.4.bin.amd64.zip
+
+cloudbase_init_latest_download_url: https://cloudbase.it/downloads/CloudbaseInitSetup_x64.msi
+cloudbase_init_112_download_url: https://github.com/cloudbase/cloudbase-init/releases/download/1.1.2/CloudbaseInitSetup_1_1_2_x64.msi
 
 enable_auto_logon: true
 

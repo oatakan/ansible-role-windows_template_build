@@ -1,7 +1,7 @@
 ---
 
 - name: remove default apps
-  win_shell: |
+  ansible.windows.win_shell: |
     $ErrorActionPreference = "Stop"
     $apps = @(
         "Microsoft.3DBuilder",
@@ -83,14 +83,14 @@
   until: cleanup_win10_remove is successful
   retries: 5
   delay: 1
-  ignore_errors: true
+  failed_when: false
 
 - name: prevent suggested applications from returning
-  win_regedit:
+  ansible.windows.win_regedit:
     path: HKLM:\SOFTWARE\Policies\Microsoft\Windows\Cloud Content
     name: DisableWindowsConsumerFeatures
     data: 1
     datatype: dword
 
 - name: reboot to effect pending changes
-  win_reboot:
+  ansible.windows.win_reboot:

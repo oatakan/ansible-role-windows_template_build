@@ -1,20 +1,21 @@
 ---
 
 - name: see if Optimize-Volume cmdlet is available
-  win_command: powershell.exe "Get-Command -Name Optimize-Volume"
+  ansible.windows.win_command: powershell.exe "Get-Command -Name Optimize-Volume"
   register: cleanup_defrag_cmdlet
-  failed_when: False
+  failed_when: false
+  changed_when: false
 
 - name: defrag C with PS cmdlet
-  win_command: powershell.exe "Optimize-Volume -DriveLetter C"
+  ansible.windows.win_command: powershell.exe "Optimize-Volume -DriveLetter C"
   when: cleanup_defrag_cmdlet.rc == 0
 
 - name: defrag C with legacy exe
-  win_command: 'Defrag.exe C:'
+  ansible.windows.win_command: 'Defrag.exe C:'
   when: cleanup_defrag_cmdlet.rc != 0
 
 - name: 0 out empty space for later compression
-  win_shell: |
+  ansible.windows.win_shell: |
     $path = "C:\zero"
     $volume = Get-WmiObject -Class Win32_LogicalDisk -Filter "DeviceID='C:'"
     $block_size = 64kb

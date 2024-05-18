@@ -1,30 +1,30 @@
 ---
 
 - name: remove user apps
-  script: RemoveUserApps.ps1
+  ansible.builtin.script: RemoveUserApps.ps1
   register: cleanup_win10_remove
   until: cleanup_win10_remove is successful
   retries: 3
   delay: 1
-  ignore_errors: true
+  failed_when: false
 
-#- name: disable windows store
-#  win_regedit:
-#    path: HKLM:\Software\Policies\Microsoft\WindowsStore
-#    name: AutoDownload
-#    data: 00000002
-#    type: dword
+# - name: disable windows store
+#   ansible.windows.win_regedit:
+#     path: HKLM:\Software\Policies\Microsoft\WindowsStore
+#     name: AutoDownload
+#     data: 00000002
+#     type: dword
 #
-#- name: disable content delivery manager
-#  win_regedit:
-#    path: HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager
-#    name: SilentInstalledAppsEnabled
-#    data: 00000000
-#    type: dword
+# - name: disable content delivery manager
+#   ansible.windows.win_regedit:
+#     path: HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager
+#     name: SilentInstalledAppsEnabled
+#     data: 00000000
+#     type: dword
 #
-#- name: disable windows store
-#  win_regedit:
-#    path: HKLM:\Software\Policies\Microsoft\Windows\CloudContent
-#    name: DisableWindowsConsumerFeatures
-#    data: 00000001
-#    type: dword
+# - name: disable windows store
+#   ansible.windows.win_regedit:
+#     path: HKLM:\Software\Policies\Microsoft\Windows\CloudContent
+#     name: DisableWindowsConsumerFeatures
+#     data: 00000001
+#     type: dword

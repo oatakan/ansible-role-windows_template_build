@@ -1,7 +1,7 @@
 ---
 
 - name: remove page file
-  win_regedit:
+  ansible.windows.win_regedit:
     path: HKLM:\System\CurrentControlSet\Control\Session Manager\Memory Management
     name: PagingFiles
     data: ""
@@ -9,30 +9,30 @@
   register: cleanup_pagefile_removal
 
 - name: reboot server after clearing page file
-  win_reboot:
+  ansible.windows.win_reboot:
   when: cleanup_pagefile_removal is changed
 
 - name: cleanup the temp folders
-  win_file:
+  ansible.windows.win_file:
     path: '{{ item }}'
     state: absent
-  ignore_errors: true
+  failed_when: false
   loop:
     - C:\Temp
     - C:\Windows\Panther
     - C:\Windows\Temp
 
 - name: cleanup the C:\Recovery folder
-  win_shell: Remove-Item -Path C:\Recovery -Force -Recurse
-  ignore_errors: true
+  ansible.windows.win_shell: Remove-Item -Path C:\Recovery -Force -Recurse
+  failed_when: false
 
 - name: check to see if WinSXS ManifestCache folder exist
-  win_stat:
+  ansible.windows.win_stat:
     path: '{{ ansible_env.windir }}\winsxs\ManifestCache'
   register: winsxs_dir
 
 - name: clear out the WinSXS ManifestCache folder
-  win_shell: |
+  ansible.windows.win_shell: |
     &cmd.exe /c Takeown /f %windir%\winsxs\ManifestCache\*
     &cmd.exe /c Icacls %windir%\winsxs\ManifestCache\* /GRANT administrators:F
     &cmd.exe /c Del /q %windir%\winsxs\ManifestCache\*
