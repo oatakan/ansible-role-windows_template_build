@@ -1,11 +1,13 @@
 ---
 
-- name: test SSL and enable TLSv1.2 if needed
-  block:
-    - name: test SSL connection
-      ansible.windows.win_shell: "[System.Net.WebRequest]::Create('https://github.com').GetResponse()"
+- name: test SSL connection
+  ansible.windows.win_shell: "[System.Net.WebRequest]::Create('https://github.com').GetResponse()"
+  failed_when: false
+  changed_when: false
+  register: test_ssl_connection
 
-  rescue:
+- name: enable TLSv1.2 if needed
+  block:
     - name: enable TLSv1.2 support
       ansible.windows.win_regedit:
         path: HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\{{ item.type }}
@@ -42,3 +44,6 @@
     - name: reboot if TLS config was applied
       ansible.windows.win_reboot:
       when: enable_tls12 is changed
+  when:
+    - test_ssl_connection.rc is defined
+    - test_ssl_connection.rc != 0

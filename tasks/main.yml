@@ -48,6 +48,16 @@
   ansible.builtin.include_tasks: update_agent_win2008.yml
   when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"
 
+- name: disable force unload registry
+  ansible.windows.win_regedit:
+    path: HKLM:\Software\Policies\Microsoft\Windows\System
+    name: DisableForceUnload
+    data: 1
+    type: dword
+    state: present
+  register: disable_force_unload_registry
+  when: ('Windows Server 2008' in ansible_distribution)
+
 - name: apply hotfix for Windows 2012 and Windows 8
   ansible.builtin.include_role:
     name: "{{ windows_hotfix_role }}"
@@ -170,6 +180,18 @@
 
 - name: compact filesystem
   ansible.builtin.include_tasks: compact.yml
+
+- name: enable force unload registry
+  ansible.windows.win_regedit:
+    path: HKLM:\Software\Policies\Microsoft\Windows\System
+    name: DisableForceUnload
+    data: 1
+    type: dword
+    state: present
+  when:
+    - ('Windows Server 2008' in ansible_distribution)
+    - disable_force_unload_registry is defined
+    - disable_force_unload_registry is changed
 
 - name: ensure windows update service is enabled
   ansible.windows.win_service:
