@@ -106,7 +106,6 @@ bleachbit_clean: true
 bleachbit_free_disk_space: true
 
 ec2_ena_driver_role: oatakan.windows_ec2_ena_driver
-ovirt_guest_agent_role: oatakan.windows_ovirt_guest_agent
 virtio_role: oatakan.windows_virtio
 vmware_tools_role: oatakan.windows_vmware_tools
 virtualbox_guest_additions_role: oatakan.windows_virtualbox_guest_additions
