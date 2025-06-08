@@ -1,23 +1,37 @@
-# windows_template_build
-This repo contains an Ansible role that build a Windows template on any cloud platform(ovirt/rhev, VMware, EC2, Azure etc.)
-You can run this role as part of VMware template build role or packer role as part of CI/CD pipeline for building Windows templates.
+# Windows Template Build
 
-> **_Note:_** This role is provided as an example only. Do not use this in production. You can fork/clone and add/remove steps for your environment based on your organization's security and operational requirements.
+This role automates converting a fresh Windows installation into a reusable template. It can be executed against virtual machines running on VMware, oVirt/RHV, EC2, Azure and other platforms. Typical tasks include installing drivers, applying Windows updates, enabling RDP, installing Cloudbase-Init and finally running sysprep.
 
-Requirements
-------------
+> **Note:** The tasks provided here are meant as examples. Review and adapt them to match your environment and security policies before using in production.
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+## Requirements
 
-Role Variables
---------------
+* Ansible **2.9** or newer
+* A reachable Windows VM with WinRM enabled
+* Administrative credentials for the VM
+* Internet access for downloading updates and tools
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+If WinRM is not yet configured on the guest, execute [`ConfigureRemotingForAnsible.ps1`](https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1) from the Ansible project. The URL of this script can be changed via the `winrm_enable_script_url` variable.
 
-Dependencies
-------------
+## Role Variables
 
-A list of roles that this role utilizes:
+Below are some frequently adjusted variables. See `defaults/main.yml` and `vars/main.yml` for the complete list.
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `install_updates` | `true` | Apply Windows updates |
+| `remove_apps` | `false` | Remove built‑in applications |
+| `upgrade_powershell` | `false` | Install a newer PowerShell version |
+| `target_ovirt` | `false` | Install oVirt/QEMU drivers |
+| `target_ec2` | `false` | Install the AWS ENA driver |
+| `target_vagrant` | `false` | Settings for Vagrant boxes |
+| `shutdown_instance` | `true` | Power off after sysprep |
+
+Local administrator credentials and additional user accounts are defined in `vars/main.yml`.
+
+## Dependencies
+
+The role depends on several other roles published on Ansible Galaxy:
 
 - oatakan.windows_ec2_ena_driver
 - oatakan.windows_powershell_upgrade
@@ -29,22 +43,43 @@ A list of roles that this role utilizes:
 - oatakan.windows_parallels_tools
 - oatakan.windows_hotfix
 
-Example Playbook
-----------------
+Install them with `ansible-galaxy install -r requirements.yml` or using `ansible-galaxy collection install`.
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+## Example Playbook
 
-    - hosts: servers
-      roles:
-         - oatakan.windows_template_build
+Inventory example:
 
-License
--------
+```ini
+[windows]
+winhost ansible_host=192.0.2.10 ansible_user=Administrator ansible_password=Secret123
+```
+
+Playbook example:
+
+```yaml
+- name: Build Windows template
+  hosts: windows
+  vars:
+    ansible_connection: winrm
+    ansible_port: 5986
+    ansible_winrm_transport: credssp
+    ansible_winrm_server_cert_validation: ignore
+  roles:
+    - oatakan.windows_template_build
+```
+
+Run the playbook with:
+
+```bash
+ansible-playbook -i inventory build.yml
+```
+
+Once the play completes, the virtual machine shuts down and can be used to create new templates on your virtualization platform.
+
+## License
 
 MIT
 
-Author Information
-------------------
+## Author
 
 Orcun Atakan
-
