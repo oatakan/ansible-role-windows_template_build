@@ -75,13 +75,13 @@
                 </SynchronousCommand>
 {% else %}
                 <SynchronousCommand wcm:action="add">
-                    <CommandLine>cmd.exe /c powershell –Command "{{ expand_disk }}"</CommandLine>
+                    <CommandLine>cmd.exe /c powershell -Command "{{ expand_disk }}"</CommandLine>
                     <Description>Resize partition</Description>
                     <Order>1</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
-                    <CommandLine>cmd.exe /c powershell –Command "{{ set_network_to_private }}"</CommandLine>
+                    <CommandLine>cmd.exe /c powershell -Command "{{ set_network_to_private }}"</CommandLine>
                     <Description>Set network connection profile to private</Description>
                     <Order>2</Order>
                     <RequiresUserInput>true</RequiresUserInput>
