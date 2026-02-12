@@ -1,0 +1,36 @@
+# Ansible local artifacts
+.ansible/
+*.retry
+
+# Molecule / Ansible testing
+.molecule/
+.cache/
+
+# Python virtualenvs / caches (common when using ansible tooling)
+.venv/
+venv/
+ENV/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDEs / editors
+.idea/
+*.iml
+.vscode/
+
+# OS files
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows / SMB
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Logs
+*.log

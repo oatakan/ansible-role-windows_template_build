@@ -101,6 +101,10 @@
     start_mode: disabled
   failed_when: false
 
+- name: re-enable TLS v1.2 after windows updates
+  ansible.builtin.include_tasks: enable_tlsv12.yml
+  when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"
+
 - name: install virtio drivers
   ansible.builtin.include_role:
     name: "{{ virtio_role }}"

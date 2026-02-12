@@ -6,44 +6,58 @@
   changed_when: false
   register: test_ssl_connection
 
-- name: enable TLSv1.2 if needed
-  block:
-    - name: enable TLSv1.2 support
-      ansible.windows.win_regedit:
-        path: HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\{{ item.type }}
-        name: '{{ item.property }}'
-        data: '{{ item.value }}'
-        type: dword
-        state: present
-      register: enable_tls12
-      loop:
-        - type: Server
-          property: Enabled
-          value: 1
-        - type: Server
-          property: DisabledByDefault
-          value: 0
-        - type: Client
-          property: Enabled
-          value: 1
-        - type: Client
-          property: DisabledByDefault
-          value: 0
-
-    - name: enable strong crypto
-      ansible.windows.win_regedit:
-        path: HKLM:\{{ item }}
-        name: SchUseStrongCrypto
-        data: 1
-        type: dword
-        state: present
-      loop:
-        - 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319'
-        - 'SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v4.0.30319'
-
-    - name: reboot if TLS config was applied
-      ansible.windows.win_reboot:
-      when: enable_tls12 is changed
+- name: enable TLSv1.2 SChannel protocols
+  ansible.windows.win_regedit:
+    path: HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\{{ item.type }}
+    name: '{{ item.property }}'
+    data: '{{ item.value }}'
+    type: dword
+    state: present
+  register: enable_tls12
+  loop:
+    - type: Server
+      property: Enabled
+      value: 1
+    - type: Server
+      property: DisabledByDefault
+      value: 0
+    - type: Client
+      property: Enabled
+      value: 1
+    - type: Client
+      property: DisabledByDefault
+      value: 0
   when:
     - test_ssl_connection.rc is defined
     - test_ssl_connection.rc != 0
+
+- name: enable strong crypto and TLS defaults for .NET
+  ansible.windows.win_regedit:
+    path: HKLM:\{{ item.path }}
+    name: '{{ item.name }}'
+    data: 1
+    type: dword
+    state: present
+  loop:
+    - path: 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319'
+      name: SchUseStrongCrypto
+    - path: 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319'
+      name: SystemDefaultTlsVersions
+    - path: 'SOFTWARE\Microsoft\.NETFramework\v2.0.50727'
+      name: SchUseStrongCrypto
+    - path: 'SOFTWARE\Microsoft\.NETFramework\v2.0.50727'
+      name: SystemDefaultTlsVersions
+    - path: 'SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v4.0.30319'
+      name: SchUseStrongCrypto
+    - path: 'SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v4.0.30319'
+      name: SystemDefaultTlsVersions
+    - path: 'SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v2.0.50727'
+      name: SchUseStrongCrypto
+    - path: 'SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v2.0.50727'
+      name: SystemDefaultTlsVersions
+  register: enable_strong_crypto
+  when: "'Windows Server 2008' in ansible_distribution or 'Windows 7' in ansible_distribution"
+
+- name: reboot if TLS config was applied
+  ansible.windows.win_reboot:
+  when: (enable_tls12 is changed) or (enable_strong_crypto is changed)
