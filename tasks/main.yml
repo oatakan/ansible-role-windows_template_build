@@ -5,6 +5,9 @@
     name: "{{ windows_powershell_upgrade_role }}"
   when: upgrade_powershell | bool
 
+- name: wait for connection
+  ansible.builtin.wait_for_connection:
+
 - name: run setup module
   ansible.builtin.setup:
 
