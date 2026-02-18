@@ -23,14 +23,7 @@
 
 # This is needed on 2008 for bleachbit to work
 - name: install the visual C libraries
-  ansible.windows.win_package:
-    path: https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe
-    product_id: '{9BE518E6-ECC6-35A9-88E4-87755C07200F}'
-    arguments: '/qb!'
-  register: install_visual_c
-  until: install_visual_c is success
-  delay: 10
-  retries: 60
+  ansible.builtin.include_tasks: visual_c.yml
   when: "'Windows Server 2008' in ansible_distribution"
 
 - name: delete update directory

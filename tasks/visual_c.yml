@@ -1,0 +1,26 @@
+---
+
+- name: install the visual C libraries (win_package)
+  ansible.windows.win_package:
+    path: https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe
+    product_id: '{9BE518E6-ECC6-35A9-88E4-87755C07200F}'
+    arguments: '/qb!'
+  when: (ansible_powershell_version | default('0') | string) is version('5.0', '>=')
+
+- name: install the visual C libraries (legacy PowerShell)
+  block:
+    - name: download visual C installer
+      ansible.windows.win_get_url:
+        url: https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe
+        dest: '{{ temp_directory }}\vcredist_x86.exe'
+
+    - name: install the visual C libraries (win_shell)
+      ansible.windows.win_shell: |
+        Start-Process -FilePath '{{ temp_directory }}\vcredist_x86.exe' -ArgumentList '/qb!' -Wait
+
+  always:
+    - name: remove visual C installer
+      ansible.windows.win_file:
+        path: '{{ temp_directory }}\vcredist_x86.exe'
+        state: absent
+  when: (ansible_powershell_version | default('0') | string) is version('5.0', '<')

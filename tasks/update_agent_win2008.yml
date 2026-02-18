@@ -2,12 +2,48 @@
 # this updates windows update which is needed to install further updates
 # see https://docs.microsoft.com/en-US/troubleshoot/windows-client/deployment/update-windows-update-agent
 
-- name: ensure Windows Update Agent on 2008 is installed
+- name: download Windows Update Agent installer for 2008
+  ansible.windows.win_get_url:
+    url: "{{ windows_update_agent_url }}"
+    dest: "{{ temp_directory }}\\windowsupdateagent-7.6-x64.exe"
+
+- name: ensure Windows Update Agent on 2008 is installed (PowerShell 5+)
   ansible.windows.win_package:
-    path: "{{ windows_update_agent_url }}"
+    path: "{{ temp_directory }}\\windowsupdateagent-7.6-x64.exe"
     arguments:
       - /quiet
       - /norestart
       - /wuforce
     creates_path: C:\Windows\System32\wuaueng.dll
     creates_version: 7.6.7600.320
+  when: (ansible_powershell_version | default('0') | string) is version('5.0', '>=')
+
+- name: ensure Windows Update Agent on 2008 is installed (PowerShell < 5 fallback)
+  ansible.windows.win_shell: |
+    $wuagentDll = 'C:\Windows\System32\wuaueng.dll'
+    $requiredVersion = [version]'7.6.7600.320'
+
+    if (Test-Path -Path $wuagentDll) {
+      $rawVersion = (Get-Item -Path $wuagentDll).VersionInfo.FileVersion
+      $normalizedVersion = ($rawVersion -split ' ')[0]
+      if ($normalizedVersion -match '^\d+(\.\d+){1,3}$') {
+        $currentVersion = [version]$normalizedVersion
+        if ($currentVersion -ge $requiredVersion) {
+          Write-Output 'already_installed'
+          exit 0
+        }
+      }
+    }
+
+    $installer = '{{ temp_directory }}\\windowsupdateagent-7.6-x64.exe'
+    $process = Start-Process -FilePath $installer -ArgumentList '/quiet', '/norestart', '/wuforce' -Wait -PassThru
+    $exitCode = if ($null -ne $process) { [int]$process.ExitCode } else { [int]$LASTEXITCODE }
+
+    if (($exitCode -ne 0) -and ($exitCode -ne 3010)) {
+      throw "Windows Update Agent installer failed with exit code $exitCode"
+    }
+
+    Write-Output 'installed'
+  register: update_agent_win2008
+  changed_when: "'installed' in (update_agent_win2008.stdout_lines | default([]))"
+  when: (ansible_powershell_version | default('0') | string) is version('5.0', '<')
