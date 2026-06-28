@@ -8,6 +8,8 @@ powershell_target_version: 3.0
 default_temp_directory: 'C:\Windows\Temp'
 update_retry_limit: 10
 upgrade_wait_timeout: 600
+windows_template_build_reboot_timeout: 600
+windows_template_build_reboot_post_delay: 0
 
 win_update_server: '' # wsus server ip/hostname
 

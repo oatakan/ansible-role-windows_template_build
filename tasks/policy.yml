@@ -32,6 +32,8 @@
 
         - name: reboot if needed
           ansible.windows.win_reboot:
+            reboot_timeout: "{{ windows_template_build_reboot_timeout | int }}"
+            post_reboot_delay: "{{ windows_template_build_reboot_post_delay | int }}"
           when: >
             (enable_webdav_redirector is changed and enable_webdav_redirector.reboot_required) or
             (enable_desktop_experience is changed and enable_desktop_experience.reboot_required)
