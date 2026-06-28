@@ -15,6 +15,7 @@
     name: cloudbase-init
     start_mode: auto
   when:
+    - install_cloudbase_init | bool
     - ('VMware' not in (ansible_product_name | default('', true)))
     - ('VirtualBox' not in (ansible_product_name | default('', true)))
     - ('KubeVirt' not in (ansible_system_vendor | default('', true)))

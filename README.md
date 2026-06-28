@@ -20,6 +20,7 @@ Below are some frequently adjusted variables. See `defaults/main.yml` and `vars/
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `install_updates` | `true` | Apply Windows updates |
+| `install_cloudbase_init` | `true` | Install and enable Cloudbase-Init before sysprep |
 | `remove_apps` | `false` | Remove built‑in applications |
 | `upgrade_powershell` | `false` | Install a newer PowerShell version |
 | `target_ovirt` | `false` | Install oVirt/QEMU drivers |
