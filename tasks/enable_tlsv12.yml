@@ -60,4 +60,6 @@
 
 - name: reboot if TLS config was applied
   ansible.windows.win_reboot:
+    reboot_timeout: "{{ windows_template_build_reboot_timeout | int }}"
+    post_reboot_delay: "{{ windows_template_build_reboot_post_delay | int }}"
   when: (enable_tls12 is changed) or (enable_strong_crypto is changed)

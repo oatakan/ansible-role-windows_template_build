@@ -95,3 +95,5 @@
 
 - name: reboot to effect pending changes
   ansible.windows.win_reboot:
+    reboot_timeout: "{{ windows_template_build_reboot_timeout | int }}"
+    post_reboot_delay: "{{ windows_template_build_reboot_post_delay | int }}"

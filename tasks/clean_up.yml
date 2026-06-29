@@ -10,6 +10,8 @@
 
 - name: reboot server after clearing page file
   ansible.windows.win_reboot:
+    reboot_timeout: "{{ windows_template_build_reboot_timeout | int }}"
+    post_reboot_delay: "{{ windows_template_build_reboot_post_delay | int }}"
   when: cleanup_pagefile_removal is changed
 
 - name: cleanup the temp folders
